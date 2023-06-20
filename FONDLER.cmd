@@ -3,7 +3,7 @@
 
 :: Most of the beginning of this file was stolen from MAS (https://massgrave.dev/)
 :: Thank you to awuctl and lyssa69 for the ideas
-::
+:: Credit to ave9598 (may) for the edge uninstall script
 ::===============================================================================
 
 :: Re-launch the script with x64 process if it was initiated by x86 process on x64 bit Windows
@@ -169,9 +169,79 @@ if not defined _desktop_ for /f "delims=" %%a in ('%psc% "& {write-host $([Envir
 
 set "_pdesk=%_desktop_:'=''%"
 setlocal EnableDelayedExpansion
+::============================== ASK FOR BROSWER REMOVAL ==================================================================================
+cls
+color 07
+mode 76, 30
 
+echo:
+echo:       --------------------------------------------------------------
+echo:
+echo:               Remove Microsoft Edge and Internet Explorer?
+echo:
+echo:       --------------------------------------------------------------
+echo:
+call :_color2 %_White% "          " %_Green% "Enter a menu option in the Keyboard [Y,N] :"
+choice /C:YN /N
+set _erl=%errorlevel%
+
+if /l %_erl%==y set _removeBrowsers=1
+if /l %_erl%==n set _removeBrowsers=0
 ::========================================================================================================================================
+:: disable cortana and web search (1)
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortana /t REG_DWORD /d 0 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowSearchToUseLocation /t REG_DWORD /d 0 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v DisableWebSearch /t REG_DWORD /d 1 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v ConnectedSearchUseWeb /t REG_DWORD /d 0 /f
+:: disable find my device (1)
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\FindMyDevice\AllowFindMyDevice" /t REG_DWORD /d 0
 
+
+
+
+
+
+:: References:
+:: (1) https://learn.microsoft.com/en-us/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services
+::
+::========================================================================================================================================
+::
+:: Remove Internet Explorer and Edge
+if %_removeBrowsers%==1 (
+powershell -Command "
+Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 –Online
+
+$regView = [Microsoft.Win32.RegistryView]::Registry32
+$microsoft = [Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine, $regView).
+OpenSubKey('SOFTWARE\Microsoft', $true)
+
+$edgeClient = $microsoft.OpenSubKey('EdgeUpdate\ClientState\{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}', $true)
+if ($null -ne $edgeClient.GetValue('experiment_control_labels')) {
+	$edgeClient.DeleteValue('experiment_control_labels')
+}
+
+$microsoft.CreateSubKey('EdgeUpdateDev').SetValue('AllowUninstall', '')
+
+$uninstallRegKey = $microsoft.OpenSubKey('Windows\CurrentVersion\Uninstall\Microsoft Edge')
+$uninstallString = $uninstallRegKey.GetValue('UninstallString') + ' --force-uninstall'
+Start-Process cmd.exe "/c $uninstallString" -WindowStyle Hidden
+
+$appxStore = '\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore'
+$pattern = "HKLM:$appxStore\InboxApplications\Microsoft.MicrosoftEdge_*_neutral__8wekyb3d8bbwe"
+$key = (Get-Item -Path $pattern).PSChildName
+reg delete "HKLM$appxStore\InboxApplications\$key" /f
+
+$SID = (New-Object System.Security.Principal.NTAccount($env:USERNAME)).Translate([Security.Principal.SecurityIdentifier]).Value
+
+New-Item -Path "HKLM:$appxStore\EndOfLife\$SID\Microsoft.MicrosoftEdge_8wekyb3d8bbwe" -Force
+
+Get-AppxPackage -Name Microsoft.MicrosoftEdge | Remove-AppxPackage
+
+Remove-Item -Path "HKLM:$appxStore\EndOfLife\$SID\Microsoft.MicrosoftEdge_8wekyb3d8bbwe"
+"
+) else (
+echo Skipping broswer removal...
+)
 :+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 :MASend
