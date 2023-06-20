@@ -81,8 +81,6 @@ set _NCS=1
 if %winbuild% LSS 10586 set _NCS=0
 if %winbuild% GEQ 10586 reg query "HKCU\Console" /v ForceV2 2>nul | find /i "0x0" 1>nul && (set _NCS=0)
 
-call :_colorprep
-
 set "nceline=echo: &echo ==== ERROR ==== &echo:"
 set "eline=echo: &call :_color %Red% "==== ERROR ====" &echo:"
 
