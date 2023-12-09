@@ -2,7 +2,7 @@
 @echo off
 
 :: Most of the beginning of this file was stolen from MAS (https://massgrave.dev/)
-:: Thank you to awuctl and lyssa69 for the ideas
+:: Thank you to awuctl and lyssa for the ideas
 :: Credit to ave9598 (may) for the edge uninstall script
 ::===============================================================================
 
