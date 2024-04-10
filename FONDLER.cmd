@@ -1,9 +1,8 @@
 @setlocal DisableDelayedExpansion
-@echo off
+@echo off &title commence the fondling
 
-:: Most of the beginning of this file was stolen from MAS (https://massgrave.dev/)
+:: most of this file is ripped from MAS
 :: Thank you to awuctl and lyssa for the ideas
-:: Credit to ave9598 (may) for the edge uninstall script
 ::===============================================================================
 
 :: Re-launch the script with x64 process if it was initiated by x86 process on x64 bit Windows
@@ -89,7 +88,7 @@ set "eline=echo: &call :_color %Red% "==== ERROR ====" &echo:"
 if %winbuild% LSS 7600 (
 %nceline%
 echo Unsupported OS version detected.
-echo Project is supported only for Windows 7/8/8.1/10/11 and their Server equivalent.
+echo Fondler is supported only for Windows 7/8/8.1/10/11 and their Server equivalent.
 goto MASend
 )
 
@@ -170,13 +169,19 @@ if not defined _desktop_ for /f "delims=" %%a in ('%psc% "& {write-host $([Envir
 set "_pdesk=%_desktop_:'=''%"
 setlocal EnableDelayedExpansion
 ::========================================================================================================================================
-:: Put Firefox on desktop.
-curl -L -o %USERPROFILE%\Desktop\Firefox.exe "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US"
 
-:: Disable cortana and web search
+:: HKCU entries will also be propagated to new users:
+reg load HKU\New "%SystemDrive%\Users\Default\NTUSER.DAT" >nul && set "HKU=1" || set "HKU="
+
+:: Disable cortana
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortana /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortanaInAAD /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortanaAboveLock /t REG_DWORD /d 0 /f
+@set "rule=v2.25|Action=Block|Active=TRUE|Dir=Out|Protocol=6|App=%systemroot%"
+@set "rule=%rule%\SystemApps\Microsoft.Windows.Cortana_cw5n1h2txyewy\searchUI.exe|Name=Block outbound Cortana|"
+reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsFirewall\FirewallRules" /f /v {0DE40C8E-C126-4A27-9371-A27DAB1039F7} /d "%rule%" 
+
+:: Disable web and location-based search
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowSearchToUseLocation /t REG_DWORD /d 0 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v DisableWebSearch /t REG_DWORD /d 1 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v ConnectedSearchUseWeb /t REG_DWORD /d 0 /f
@@ -254,6 +259,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /T REG_DWO
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate" /v DoNotUpdateToEdgeWithChromium /t REG_DWORD /d 1 /f
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /v NoUseStoreOpenWith /t REG_DWORD /d 1 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+reg delete "HKLM\SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot" /f /v DisableRootAutoUpdate
 
 
 
@@ -304,6 +310,7 @@ Get-AppxPackage Microsoft.SkypeApp | Remove-AppxPackage
 Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.MicrosoftStickyNotes"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
 Get-AppxPackage Microsoft.MicrosoftStickyNotes | Remove-AppxPackage
 ;}"
+
 :+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 :MASend
