@@ -416,10 +416,10 @@ Get-AppxPackage Microsoft.BingWeather -AllUsers | Remove-AppxPackage
 Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.BingWeather"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
 
 Get-AppxPackage *Microsoft.GetHelp* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.GetHelp'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.GetHelp"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.Getstarted* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.Getstarted'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.Getstarted"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage Microsoft.Office.Sway -AllUsers | Remove-AppxPackage
 Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.Office.Sway"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
@@ -431,52 +431,52 @@ Get-AppxPackage Microsoft.MicrosoftOfficeHub -AllUsers | Remove-AppxPackage
 Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.MicrosoftOfficeHub"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
 
 Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.MicrosoftSolitaireCollection'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.MicrosoftSolitaireCollection"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage Microsoft.MicrosoftStickyNotes -AllUsers | Remove-AppxPackage
 Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.MicrosoftStickyNotes"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
 
 Get-AppxPackage *Microsoft.MixedReality.Portal* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.MixedReality.Portal'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.MixedReality.Portal"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage Microsoft.SkypeApp -AllUsers | Remove-AppxPackage
 Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.SkypeApp"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
 
 Get-AppxPackage *Microsoft.WindowsAlarms* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.WindowsAlarms'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.WindowsAlarms"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *microsoft.windowscommunicationsapps* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'microsoft.windowscommunicationsapps'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "microsoft.windowscommunicationsapps"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.WindowsFeedbackHub* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.WindowsFeedbackHub'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.WindowsFeedbackHub"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.WindowsMaps* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.WindowsMaps'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.WindowsMaps"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.WindowsSoundRecorder* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.WindowsSoundRecorder'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.WindowsSoundRecorder"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage Microsoft.XboxApp -AllUsers | Remove-AppxPackage
 Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.XboxApp"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
 
 Get-AppxPackage *Microsoft.Xbox.TCUI* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.XboxTCUI'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.XboxTCUI"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.XboxGameOverlay* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.XboxGameOverlay'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.XboxGameOverlay"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.XboxGamingOverlay* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.XboxGamingOverlay'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.XboxGamingOverlay"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.YourPhone* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.YourPhone'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.YourPhone"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.ZuneMusic* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.ZuneMusic'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.ZuneMusic"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.ZuneVideo* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq 'Microsoft.ZuneVideo'} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.ZuneVideo"} | Remove-AppxProvisionedPackage -Online
 
 Get-AppxPackage *Microsoft.Messaging* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.Microsoft3DViewer* -AllUsers | Remove-AppxPackage
