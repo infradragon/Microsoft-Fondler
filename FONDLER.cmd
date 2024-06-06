@@ -55,48 +55,28 @@ cls
 color 07
 title  Microsoft-Fondler
 
-set _args=
-set _elev=
-set _MASunattended=
-
-set _args=%*
-if defined _args set _args=%_args:"=%
-if defined _args (
-for %%A in (%_args%) do (
-if /i "%%A"=="-el"                    set _elev=1
-)
-)
-
-if defined _args echo "%_args%" | find /i "/" >nul && set _MASunattended=1
-
 ::========================================================================================================================================
 
 set winbuild=1
 set "nul=>nul 2>&1"
-set psc=powershell.exe
 for /f "tokens=6 delims=[]. " %%G in ('ver') do set winbuild=%%G
 
 set _NCS=1
 if %winbuild% LSS 10586 set _NCS=0
 if %winbuild% GEQ 10586 reg query "HKCU\Console" /v ForceV2 2>nul | find /i "0x0" 1>nul && (set _NCS=0)
 
-set "nceline=echo: &echo ==== ERROR ==== &echo:"
-set "eline=echo: &call :_color %Red% "==== ERROR ====" &echo:"
-
 ::========================================================================================================================================
 
 if %winbuild% LSS 7600 (
-%nceline%
 echo Unsupported OS version detected.
 echo Fondler is supported only for Windows 7/8/8.1/10/11 and their Server equivalent.
-goto MASend
+goto FondlerEnd
 )
 
 for %%# in (powershell.exe) do @if "%%~$PATH:#"=="" (
-%nceline%
 echo Unable to find powershell.exe in the system.
 echo Aborting...
-goto MASend
+goto FondlerEnd
 )
 
 ::========================================================================================================================================
@@ -115,59 +95,17 @@ set "_ttemp=%temp%"
 
 setlocal EnableDelayedExpansion
 
-::========================================================================================================================================
-
-echo "!_batf!" | find /i "!_ttemp!" 1>nul && (
-if /i not "!_work!"=="!_ttemp!" (
-%nceline%
-echo Script is launched from the temp folder,
-echo Most likely you are running the script directly from an archive file.
-echo:
-echo Extract the archive file and launch the script from the extracted folder.
-goto MASend
-)
-)
-
-::========================================================================================================================================
-
 ::  Elevate script as admin and pass arguments and preventing loop
 
 >nul fltmc || (
-if not defined _elev %nul% %psc% "start cmd.exe -arg '/c \"!_PSarg:'=''!\"' -verb runas" && exit /b
-%nceline%
+if not defined _elev %nul% powershell.exe "start cmd.exe -arg '/c \"!_PSarg:'=''!\"' -verb runas" && exit /b
 echo This script require administrator privileges.
 echo To do so, right click on this script and select 'Run as administrator'.
-goto MASend
+goto FondlerEnd
 )
 
 if not exist "%SystemRoot%\Temp\" mkdir "%SystemRoot%\Temp" 1>nul 2>nul
 
-::========================================================================================================================================
-
-::  Run script with parameters in unattended mode
-
-set _elev=
-if defined _args echo "%_args%" | find /i "/S" %nul% && (set "_silent=%nul%") || (set _silent=)
-if defined _args echo "%_args%" | find /i "/" %nul% && (
-echo "%_args%" | find /i "/HWID"   %nul% && (setlocal & (call :HWIDActivation   %_args% %_silent%) & cls & endlocal)
-echo "%_args%" | find /i "/KMS38"  %nul% && (setlocal & (call :KMS38Activation  %_args% %_silent%) & cls & endlocal)
-echo "%_args%" | find /i "/KMS-"   %nul% && (setlocal & (call :KMSActivation    %_args% %_silent%) & cls & endlocal)
-echo "%_args%" | find /i "/Insert" %nul% && (setlocal & (call :insert_hwidkey   %_args% %_silent%) & cls & endlocal)
-exit /b
-)
-
-::========================================================================================================================================
-
-setlocal DisableDelayedExpansion
-
-::  Check desktop location
-
-set _desktop_=
-for /f "skip=2 tokens=2*" %%a in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /v Desktop') do call set "_desktop_=%%b"
-if not defined _desktop_ for /f "delims=" %%a in ('%psc% "& {write-host $([Environment]::GetFolderPath('Desktop'))}"') do call set "_desktop_=%%a"
-
-set "_pdesk=%_desktop_:'=''%"
-setlocal EnableDelayedExpansion
 ::========================================================================================================================================
 
 :: HKCU entries will also be propagated to new users:
@@ -315,7 +253,7 @@ reg add "HKCU\Software\Microsoft\InputPersonalization" /v RestrictImplicitInkCol
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v CortanaConsent /t REG_DWORD /d 0 /f
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Siuf\Rules" /v "NumberOfSIUFInPeriod" /t REG_DWORD /d 0 /f
 reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Siuf\Rules" /v "PeriodInNanoSeconds" /t REG_DWORD /d 0 /f
-reg add	"HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /T REG_DWORD /V "AllowTelemetry" /D 0 /F
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /T REG_DWORD /V "AllowTelemetry" /D 0 /F
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows Defender\Spynet" /t REG_DWORD /v SpyNetReporting /d 0 /f
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows Defender\Spynet"  /t REG_DWORD /v SubmitSamplesConsent /d 2 /f
 
@@ -340,6 +278,16 @@ reg add "HKCU\Software\Microsoft\Windows Security Health\State" /t REG_DWORD /v 
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\OneDrive" /v PreventNetworkTrafficPreUserSignIn /t REG_DWORD /d 1 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v DisableFileSyncNGSC /t REG_DWORD /d 1 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost" /v EnableWebContentEvaluation /t REG_DWORD /d 0 /f
+
+:: Disable left widgets in Windows 11
+reg add HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\AllowNewsAndInterests /T REG_DWORD /V "value" /D 0 /F
+reg add HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Dsh /T REG_DWORD /V "AllowNewsAndInterests" /D 0 /F
+
+:: Disable Copilot on Taskbar in Windows 11
+reg add HKCU\Software\Policies\Microsoft\Windows\WindowsCopilot /T REG_DWORD /V "TurnOffWindowsCopilot" /D 1 /F
+
+:: Disable Microsoft account sign-in nag in Windows 11
+reg add HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /T REG_DWORD /V "Start_AccountNotifications" /D 1 /F
 
 :: Disable autoplay
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" /T REG_DWORD /V "DisableAutoplay" /D 1 /F
@@ -389,7 +337,7 @@ reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\AppPrivacy" /v L
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore" /v Location /t REG_SZ /d Deny /f
 
 :: Disable LLMNR
-reg add “HKLM\Software\policies\Microsoft\Windows NT\DNSClient” /v ”EnableMulticast” /t REG_DWORD /d “0” /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient" /v EnableMulticast /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient" /v DisableSmartNameResolution /t REG_DWORD /d 1 /f
 
 :: Disable storing password in memory in cleartext
@@ -398,115 +346,81 @@ reg add HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest /v UseLo
 :: Require administrator to install printer drivers
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers" /v AddPrinterDrivers /t REG_DWORD /d 1 /f
 
-:: Remove preinstalled apps
-Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 –Online
+:: Uninstall Onedrive
+taskkill /f /im OneDrive.exe
+%SystemRoot%\System32\OneDriveSetup.exe /uninstall
+%SystemRoot%\SysWOW64\OneDriveSetup.exe /uninstall
 
-Get-AppxPackage *.Twitter -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "*.Twitter"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
+setlocal enabledelayedexpansion
 
-Get-AppxPackage Microsoft.BingFinance -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.BingFinance"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
+:: Define the list of appx packages to remove
+set packages[1]=ActiproSoftware
+set packages[2]=AdobeSystemIncorporated. AdobePhotoshop
+set packages[3]=Clipchamp.Clipchamp
+set packages[4]=Duolingo
+set packages[5]=EclipseManager
+set packages[6]=king.com.
+set packages[7]=Microsoft.BingFinance
+set packages[8]=Microsoft.BingNews
+set packages[9]=Microsoft.BingSports
+set packages[10]=Microsoft.BingWeather
+set packages[11]=Microsoft.GetHelp
+set packages[12]=Microsoft.Getstarted
+set packages[13]=Microsoft.Office.Sway
+set packages[14]=Microsoft.Office.OneNote
+set packages[15]=Microsoft.MicrosoftOfficeHub
+set packages[16]=Microsoft.MicrosoftSolitaireCollection
+set packages[17]=Microsoft.MicrosoftStickyNotes
+set packages[18]=Microsoft.MixedReality.Portal
+set packages[19]=Microsoft.SkypeApp
+set packages[20]=Microsoft.Todo
+set packages[21]=Microsoft.WindowsAlarms
+set packages[22]=microsoft.windowscommunicationsapps
+set packages[23]=Microsoft.WindowsFeedbackHub
+set packages[24]=Microsoft.WindowsMaps
+set packages[25]=Microsoft.WindowsSoundRecorder
+set packages[26]=Microsoft.XboxApp
+set packages[27]=Microsoft.Xbox.TCUI
+set packages[28]=Microsoft.XboxGameOverlay
+set packages[29]=Microsoft.XboxGamingOverlay
+set packages[30]=Microsoft.YourPhone
+set packages[31]=Microsoft.ZuneMusic
+set packages[32]=Microsoft.ZuneVideo
+set packages[33]=Microsoft.Messaging
+set packages[34]=MicrosoftCorporationII.MicrosoftFamily
+set packages[35]=Microsoft.OutlookForWindows
+set packages[36]=MicrosoftCorporationII.QuickAssist
+set packages[37]=Microsoft.MicrosoftNotes
+set packages[38]=Microsoft.Microsoft3DViewer
+set packages[39]=Microsoft.OneConnect
+set packages[40]=Microsoft.Print3D
+set packages[41]=Microsoft.Services.Store.Engagement
+set packages[42]=Microsoft.Wallet
+set packages[43]=Microsoft.WindowsSoundRecorder
+set packages[44]=Microsoft.WindowsFeedback
+set packages[45]=Microsoft.XboxSpeechToTextOverlay
+set packages[46]=Microsoft.549981C3F5F10
+set packages[47]=netflix
+set packages[48]=PandoraMedia
+set packages[49]=SpotifyAB.SpotifyMusic
+set packages[50]=.Twitter
+set packages[51]=Windows.ContactSupport
 
-Get-AppxPackage Microsoft.BingNews -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.BingNews"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
+:: Loop through the packages and remove them
+for /l %%i in (1,1,51) do (
+    set packageName=!packages[%%i]!
+    if defined packageName (
+        echo Removing installed package: !packageName!
+        powershell -Command "Get-AppxPackage *!packageName!* -AllUsers | Remove-AppxPackage"
+        echo Removing provisioned package: !packageName!
+        powershell -Command "Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like '!packageName!'} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName }"
+    )
+)
 
-Get-AppxPackage Microsoft.BingSports -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.BingSports"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
+endlocal
 
-Get-AppxPackage Microsoft.BingWeather -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.BingWeather"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
-
-Get-AppxPackage *Microsoft.GetHelp* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.GetHelp"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.Getstarted* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.Getstarted"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage Microsoft.Office.Sway -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.Office.Sway"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
-
-Get-AppxPackage Microsoft.Office.OneNote -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.Office.OneNote"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
-
-Get-AppxPackage Microsoft.MicrosoftOfficeHub -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.MicrosoftOfficeHub"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
-
-Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.MicrosoftSolitaireCollection"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage Microsoft.MicrosoftStickyNotes -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.MicrosoftStickyNotes"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
-
-Get-AppxPackage *Microsoft.MixedReality.Portal* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.MixedReality.Portal"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage Microsoft.SkypeApp -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.SkypeApp"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
-
-Get-AppxPackage *Microsoft.WindowsAlarms* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.WindowsAlarms"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *microsoft.windowscommunicationsapps* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "microsoft.windowscommunicationsapps"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.WindowsFeedbackHub* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.WindowsFeedbackHub"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.WindowsMaps* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.WindowsMaps"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.WindowsSoundRecorder* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.WindowsSoundRecorder"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage Microsoft.XboxApp -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like "Microsoft.XboxApp"} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName}
-
-Get-AppxPackage *Microsoft.Xbox.TCUI* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.XboxTCUI"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.XboxGameOverlay* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.XboxGameOverlay"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.XboxGamingOverlay* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.XboxGamingOverlay"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.YourPhone* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.YourPhone"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.ZuneMusic* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.ZuneMusic"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.ZuneVideo* -AllUsers | Remove-AppxPackage
-Get-AppxProvisionedPackage -Online | Where-Object {$_.DisplayName -eq "Microsoft.ZuneVideo"} | Remove-AppxProvisionedPackage -Online
-
-Get-AppxPackage *Microsoft.Messaging* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.Microsoft3DViewer* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.MicrosoftNotes* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.OneConnect* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.Print3D* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.Services.Store.Engagement* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.Wallet* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.WindowsSoundRecorder* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.WindowsFeedback* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.XboxSpeechToTextOverlay* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Windows.ContactSupport* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *PandoraMedia* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *AdobeSystemIncorporated. AdobePhotoshop* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Duolingo* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.Advertising.Xaml* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *ActiproSoftware* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *EclipseManager* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *SpotifyAB.SpotifyMusic* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *king.com.* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *netflix* -AllUsers | Remove-AppxPackage
-
-:+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-:MASend
+:FondlerEnd
 echo:
-if defined _MASunattended timeout /t 2 & exit /b
 echo Press any key to exit...
 pause >nul
 exit /b
-
-::End::
