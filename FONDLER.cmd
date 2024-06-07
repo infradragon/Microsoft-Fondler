@@ -280,14 +280,16 @@ reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v Dis
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost" /v EnableWebContentEvaluation /t REG_DWORD /d 0 /f
 
 :: Disable left widgets in Windows 11
-reg add HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\AllowNewsAndInterests /T REG_DWORD /V "value" /D 0 /F
-reg add HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Dsh /T REG_DWORD /V "AllowNewsAndInterests" /D 0 /F
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\AllowNewsAndInterests" /T REG_DWORD /V "value" /D 0 /F
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Dsh" /T REG_DWORD /V "AllowNewsAndInterests" /D 0 /F
 
-:: Disable Copilot on Taskbar in Windows 11
-reg add HKCU\Software\Policies\Microsoft\Windows\WindowsCopilot /T REG_DWORD /V "TurnOffWindowsCopilot" /D 1 /F
+:: Disable Copilot
+reg add "HKCU\Software\Policies\Microsoft\Windows\WindowsCopilot" /T REG_DWORD /V "TurnOffWindowsCopilot" /D 1 /F
+reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsCopilot" /T REG_DWORD /V "TurnOffWindowsCopilot" /D 1 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsAI" /T REG_DWORD /V "DisableAIDataAnalysis" /D 1 /F
 
 :: Disable Microsoft account sign-in nag in Windows 11
-reg add HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /T REG_DWORD /V "Start_AccountNotifications" /D 1 /F
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /T REG_DWORD /V "Start_AccountNotifications" /D 1 /F
 
 :: Disable autoplay
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" /T REG_DWORD /V "DisableAutoplay" /D 1 /F
