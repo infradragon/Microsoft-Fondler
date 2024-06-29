@@ -409,7 +409,7 @@ set packages[49]=SpotifyAB.SpotifyMusic
 set packages[50]=.Twitter
 set packages[51]=Windows.ContactSupport
 
-set count=0
+set count=1
 
 :: Iterate through the elements of the array to calculate its length
 :ArrLoop
@@ -421,7 +421,7 @@ if defined packages[%count%] (
 echo Removing %count% appx packages.
 
 :: Loop through the packages and remove them
-for /l %%i in (1,1,%count%) do (
+for /l %%i in (1,1,%count%-1) do (
     set packageName=!packages[%%i]!
     if defined packageName (
         echo Removing installed package: !packageName!
