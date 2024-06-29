@@ -409,11 +409,16 @@ set packages[49]=SpotifyAB.SpotifyMusic
 set packages[50]=.Twitter
 set packages[51]=Windows.ContactSupport
 
-:: Find the length of the array
-set "count=0"
-for /f "tokens=2 delims=[]=" %%a in ('set packages[') do (
+set count=0
+
+:: Iterate through the elements of the array to calculate its length
+:ArrLoop
+if defined packages[%count%] (
     set /a count+=1
+    GOTO :ArrLoop
 )
+
+echo Removing %count% appx packages.
 
 :: Loop through the packages and remove them
 for /l %%i in (1,1,%count%) do (
