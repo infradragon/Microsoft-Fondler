@@ -409,8 +409,14 @@ set packages[49]=SpotifyAB.SpotifyMusic
 set packages[50]=.Twitter
 set packages[51]=Windows.ContactSupport
 
+:: Find the length of the array
+set "count=0"
+for /f "tokens=2 delims=[]=" %%a in ('set packages[') do (
+    set /a count+=1
+)
+
 :: Loop through the packages and remove them
-for /l %%i in (1,1,51) do (
+for /l %%i in (1,1,%count%) do (
     set packageName=!packages[%%i]!
     if defined packageName (
         echo Removing installed package: !packageName!
