@@ -349,6 +349,9 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" /v Use
 :: Require administrator to install printer drivers
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers" /v AddPrinterDrivers /t REG_DWORD /d 1 /f
 
+:: Prevent DevHome from being installed via WU
+reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\DevHomeUpdate" /f
+
 :: Uninstall Onedrive
 taskkill /f /im OneDrive.exe
 %SystemRoot%\System32\OneDriveSetup.exe /uninstall
@@ -408,6 +411,9 @@ set packages[48]=PandoraMedia
 set packages[49]=SpotifyAB.SpotifyMusic
 set packages[50]=.Twitter
 set packages[51]=Windows.ContactSupport
+set packages[52]=Windows.DevHome
+set packages[53]=Microsoft.PowerAutomateDesktop
+set packages[54]=MSTeams
 
 set count=1
 
@@ -430,6 +436,9 @@ for /l %%i in (1,1,%count%-1) do (
         powershell -Command "Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -Like '!packageName!'} | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName }"
     )
 )
+
+:: Remove legacy internet explorer if it is installed (security risk)
+powershell -Command "Get-WindowsCapability -Online Browser.InternetExplorer | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
 
 endlocal
 
