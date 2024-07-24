@@ -437,10 +437,17 @@ for /l %%i in (1,1,%count%-1) do (
     )
 )
 
+endlocal
+
 :: Remove legacy internet explorer if it is installed (security risk)
 powershell -Command "Get-WindowsCapability -Online Browser.InternetExplorer | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
 
-endlocal
+:: Enable TCP BBR2 congestion algorithm (will only work on Windows 11)
+netsh int tcp set supplemental Template=Internet CongestionProvider=bbr2
+netsh int tcp set supplemental Template=Datacenter CongestionProvider=bbr2
+netsh int tcp set supplemental Template=Compat CongestionProvider=CUBIC
+netsh int tcp set supplemental Template=DatacenterCustom CongestionProvider=bbr2
+netsh int tcp set supplemental Template=InternetCustom CongestionProvider=bbr2
 
 :FondlerEnd
 echo:
