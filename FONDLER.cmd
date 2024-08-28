@@ -249,7 +249,7 @@ reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManage
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f
 
 :: Disable Microsoft Experimentation (breaks KIR) https://winaero.com/disabling-experimentation-in-windows-10-also-breaks-known-issue-rollback/
-reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\System\AllowExperimentation" /v value /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\System" /v AllowExperimentation /t REG_DWORD /d 0 /f
 
 :: Show hidden files and file extensions
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d 0 /f
