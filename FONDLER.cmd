@@ -349,15 +349,25 @@ reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\D
 :: Disable "Fast Startup"
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /T REG_DWORD /V HiberbootEnabled /D 0 /F
 
-
+:: Dont update Edge to the chromium version if you have it installed
 reg add "HKLM\SOFTWARE\Microsoft\EdgeUpdate" /v DoNotUpdateToEdgeWithChromium /t REG_DWORD /d 1 /f
+
+:: Remove "Search the store" in the open with context menu
 reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v NoUseStoreOpenWith /t REG_DWORD /d 1 /f
+
+:: Remove the 260 character file path limits
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+
+:: Stop Windows Security from bothering you about a Microsoft account
 reg add "HKCU\Software\Microsoft\Windows Security Health\State" /t REG_DWORD /v AccountProtection_MicrosoftAccount_Disconnected /d 1 /f
+
+:: Disable Onedrive pre-signin (for users running the script before or during install)
 reg add "HKLM\SOFTWARE\Microsoft\OneDrive" /v PreventNetworkTrafficPreUserSignIn /t REG_DWORD /d 1 /f
+
+:: Disable Onedrive
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v DisableFileSyncNGSC /t REG_DWORD /d 1 /f
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost" /v EnableWebContentEvaluation /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v BingSearchEnabled /t REG_DWORD /d 0 /f
+
+
 reg add "HKLM\SOFTWARE\Policies\Microsoft\InputPersonalization" /v AllowInputPersonalization /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Microsoft\Personalization\Settings" /v AcceptedPrivacyPolicy /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Microsoft\InputPersonalization" /v RestrictImplicitTextCollection /t REG_DWORD /d 1 /f
@@ -459,7 +469,7 @@ endlocal
 :: Remove legacy internet explorer if it is installed (security risk)
 powershell -Command "Get-WindowsCapability -Online Browser.InternetExplorer | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
 
-:: Enable TCP BBR2 congestion algorithm (will only work on Windows 11)
+:: Enable TCP BBR2 congestion algorithm (will only work on Windows 11, will throw errors otherwise)
 netsh int tcp set supplemental Template=Internet CongestionProvider=bbr2
 netsh int tcp set supplemental Template=Datacenter CongestionProvider=bbr2
 netsh int tcp set supplemental Template=Compat CongestionProvider=CUBIC
