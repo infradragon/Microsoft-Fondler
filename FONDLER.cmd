@@ -470,6 +470,9 @@ reg add "HKCU\Control Panel\Desktop" /v UserPreferencesMask /t REG_BINARY /d 943
 :: Do not auto install teams
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v ConfigureChatAutoInstall /t REG_DWORD /d 0 /f
 
+:: Disallow anonymous account enumeration
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v RestrictAnonymousSAM /t REG_DWORD /d 1 /f
+
 :: Make bootloader use actual screen resolution
 bcdedit /set {globalsettings} highestmode true
 
@@ -478,6 +481,9 @@ bcdedit /set {current} bootstatuspolicy DisplayAllFailures
 
 :: Enable hibernation
 powercfg /h on
+
+:: remove defaultuser0 cuz it sucks
+net user defaultuser0 /delete
 
 :: Uninstall Onedrive
 taskkill /f /im OneDrive.exe
