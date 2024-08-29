@@ -252,6 +252,9 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Sh
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_IrisRecommendations /t REG_DWORD /d 0 /f
 
+:: Disable start menu suggested websites
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v HideRecommendedPersonalizedSites /t REG_DWORD /d 1 /f
+
 :: Disallow automatic app installs and app suggestions (must be applied pre-install or it will only apply for new users)
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SilentInstalledAppsEnabled /t REG_DWORD /d 0 /f
@@ -469,6 +472,22 @@ reg add "HKCU\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v 
 :: Enable verbose log in/out and power on/off messages
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v verbosestatus /t REG_DWORD /d 0 /f
 
+:: Disable sticky keys and related key shortcuts
+reg "add HKCU\Control Panel\Accessibility\StickyKeys" /v Flags /t REG_DWORD /d 0 /f
+reg "add HKCU\Control Panel\Accessibility\ToggleKeys" /v Flags /t REG_DWORD /d 0 /f
+reg "add HKCU\Control Panel\Accessibility\MouseKeys" /v Flags /t REG_DWORD /d 0 /f
+reg "add HKCU\Control Panel\Accessibility\Keyboard Response" /v Flags /t REG_DWORD /d 0 /f
+reg "add HKCU\Control Panel\Accessibility\HighContrast" /v Flags /t REG_DWORD /d 0 /f
+
+:: Disable language bar shortcuts
+reg add "HKCU\Control Panel\Input Method\Hot Keys\00000104"
+reg add "HKCU\Keyboard Layout\Toggle" /v Layout Hotkey /t REG_DWORD /d 3 /f
+reg add "HKCU\Keyboard Layout\Toggle" /v Language Hotkey /t REG_DWORD /d 3 /f
+reg add "HKCU\Keyboard Layout\Toggle" /v Hotkey /t REG_DWORD /d 3 /f
+
+:: Disable narrator shortcut
+reg add "HKCU\Software\Microsoft\Narrator\NoRoam" /v WinEnterLaunchEnabled /t REG_DWORD /d 0 /f
+
 :: Do not animate minimizing and maximizing windows
 reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v MinAnimate /t REG_SZ /d 0 /f
 
@@ -484,6 +503,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v RestrictAnonymousSAM /t R
 
 :: Dont reduce sound volume in calls
 reg add "HKCU\SOFTWARE\Microsoft\Multimedia\Audio" /v UserDuckingPreference /t REG_DWORD /d 3 /f
+
 
 :: ewww yucky spell checking
 reg add "HKCU\SOFTWARE\Microsoft\TabletTip\1.7" /v EnableAutocorrection /t REG_DWORD /d 0 /f
