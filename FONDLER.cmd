@@ -194,7 +194,7 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\0001000
 
 :: Encrypt and sign outgoing secure channel traffic when possible
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v "SealSecureChannel" /t REG_DWORD /d 1 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v "SignSecureChannel "/t REG_DWORD /d 1 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v "SignSecureChannel" /t REG_DWORD /d 1 /f
 
 :: Opt out of advertising and data collection
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-202913Enabled" /t REG_DWORD /d 0 /f 
@@ -350,13 +350,13 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /v "EnableFeeds
 
 :: Hide task view on taskbar
 reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MultiTaskingView\AllUpView" /v "Enabled" /f
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /d REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f
 
 :: Hide Meet Now on taskbar
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "HideSCAMeetNow" /t REG_DWORD /d 1 /f
 
 :: Disable desktop peek on taskbar
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DisablePreviewDesktop" /d REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DisablePreviewDesktop" /t REG_DWORD /d 1 /f
 
 :: Disable Windows Chat on taskbar
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Chat" /v "ChatIcon" /t REG_DWORD /d 3 /f
@@ -431,7 +431,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\WMI\Autologger\Diagtrack-Listener
 
 :: Disable Customer Experience Improvement Program (more telemetry)
 reg add "HKLM\SOFTWARE\Policies\Microsoft\AppV\CEIP" /v "CEIPEnable" /t REG_DWORD /d 0 /f
-reg add "KLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows" /v "CEIPEnable" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows" /v "CEIPEnable" /t REG_DWORD /d 0 /f
 
 :: Disable Microsoft Office telemetry
 reg add "HKCU\Software\Policies\Microsoft\office\16.0\common" /v "sendcustomerdata" /t REG_DWORD /d 0 /f
@@ -640,11 +640,11 @@ reg add "HKCU\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v 
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "verbosestatus" /t REG_DWORD /d 0 /f
 
 :: Disable sticky keys and related key shortcuts
-reg "add HKCU\Control Panel\Accessibility\StickyKeys" /v "Flags" /t REG_DWORD /d 0 /f
-reg "add HKCU\Control Panel\Accessibility\ToggleKeys" /v "Flags" /t REG_DWORD /d 0 /f
-reg "add HKCU\Control Panel\Accessibility\MouseKeys" /v "Flags" /t REG_DWORD /d 0 /f
-reg "add HKCU\Control Panel\Accessibility\Keyboard Response" /v "Flags" /t REG_DWORD /d 0 /f
-reg "add HKCU\Control Panel\Accessibility\HighContrast" /v "Flags" /t REG_DWORD /d 0 /f
+reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v "Flags" /t REG_DWORD /d 0 /f
+reg add "HKCU\Control Panel\Accessibility\ToggleKeys" /v "Flags" /t REG_DWORD /d 0 /f
+reg add "HKCU\Control Panel\Accessibility\MouseKeys" /v "Flags" /t REG_DWORD /d 0 /f
+reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v "Flags" /t REG_DWORD /d 0 /f
+reg add "HKCU\Control Panel\Accessibility\HighContrast" /v "Flags" /t REG_DWORD /d 0 /f
 
 :: Disable flashes and sounds for sticky keys and other accessibility features
 reg add "HKCU\Control Panel\Accessibility" /v "Warning Sounds" /t REG_DWORD /d 0 /f
@@ -883,15 +883,16 @@ for /l %%i in (1,1,%count%-1) do (
 endlocal
 
 :: Remove legacy internet explorer if it is installed
-powershell -Command "Get-WindowsCapability -Online Browser.InternetExplorer* | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
+powershell -Command "Get-WindowsCapability -Online "Browser.InternetExplorer~~~~0.0.11.0" | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
 
 :: Remove Exchange ActiveSync
-powershell -Command "Get-WindowsCapability -Online OneCoreUAP.OneSync* | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
+powershell -Command "Get-WindowsCapability -Online "OneCoreUAP.OneSync~~~~0.0.1.0" | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
 
 :: Remove TPM Diagnostics app
-powershell -Command "Get-WindowsCapability -Online Tpm.TpmDiagnostics* | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
+powershell -Command "Get-WindowsCapability -Online "Tpm.TpmDiagnostics~~~~0.0.1.0" | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
+
 :: Enable DirectPlay (for games)
-powershell -Command "Enable-WindowsOptionalFeature –FeatureName 'DirectPlay' -NoRestart -All -Online"
+powershell -Command "Enable-WindowsOptionalFeature -FeatureName 'DirectPlay' -NoRestart -All -Online"
 
 :: Rebuild performance counters
 lodctr /r
