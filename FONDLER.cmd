@@ -742,7 +742,6 @@ schtasks /Change /TN "\Microsoft\Windows\DiskCleanup\SilentCleanup" /ENABLE
 :: Unrestrict powershell execution policy
 reg add "HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" /v "ExecutionPolicy" /t REG_SZ /d "Unrestricted" /f
 
-
 :: Telemetry serviecs
 sc config OneSyncSvc start= disabled
 sc config TrkWks start= disabled
