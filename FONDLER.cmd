@@ -856,7 +856,7 @@ set packages[54]=MSTeams
 set packages[55]=msteams
 set packages[56]=MicrosoftTeams
 set packages[57]=Microsoft.Copilot
-:: This is Paint 3D, NOT MS Paint
+:: This is Paint 3D, NOT the real MS Paint
 set packages[58]=Microsoft.MSPaint
 
 set count=1
