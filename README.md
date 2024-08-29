@@ -1,4 +1,4 @@
-## Simple script to remove default programs, advertising, and telemetry.
+## this script is for me and has my preferences so if you dont like it go kick rocks
 This is only meant for desktop x86_64 Windows 10 and 11.
 The script requires a restart to fully apply.
 
