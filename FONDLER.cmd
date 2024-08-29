@@ -477,6 +477,9 @@ reg add "HKCU\Control Panel\Accessibility" /v "Warning Sounds" /t REG_DWORD /d 0
 reg add "HKCU\Control Panel\Accessibility" /v "Sound on Activation" /t REG_DWORD /d 0 /f
 reg add "HKCU\Control Panel\Accessibility\SoundSentry" /v "WindowsEffect" /t REG_SZ /d "0" /f
 
+:: Disable win+volume touch accessibility shortcut
+reg add "HKCU\Control Panel\Accessibility\SlateLaunch" /v "LaunchAT" /t REG_DWORD /d 0 /f
+
 :: Disable language bar shortcuts
 reg add "HKCU\Control Panel\Input Method\Hot Keys\00000104"
 reg add "HKCU\Keyboard Layout\Toggle" /v "Layout Hotkey" /t REG_DWORD /d 3 /f
@@ -486,12 +489,23 @@ reg add "HKCU\Keyboard Layout\Toggle" /v "Hotkey" /t REG_DWORD /d 3 /f
 :: Disable narrator shortcut
 reg add "HKCU\Software\Microsoft\Narrator\NoRoam" /v "WinEnterLaunchEnabled" /t REG_DWORD /d 0 /f
 
+:: Revert to classic file explorer search
+reg add "HKLM\SOFTWARE\Classes\CLSID\{1d64637d-31e9-4b06-9124-e83fb178ac6e}\TreatAs" /ve /t REG_SZ /d "{64bc32b5-4eec-4de7-972d-bd8bd0324537}"  /f
+reg add "HKLM\SOFTWARE\Classes\WOW6432Node\CLSID\{1d64637d-31e9-4b06-9124-e83fb178ac6e}\TreatAs" /ve /t REG_SZ /d "{64bc32b5-4eec-4de7-972d-bd8bd0324537}" /f
+reg add "HKLM\SOFTWARE\WOW6432Node\Classes\CLSID\{1d64637d-31e9-4b06-9124-e83fb178ac6e}\TreatAs" /ve /t REG_SZ /d "{64bc32b5-4eec-4de7-972d-bd8bd0324537}" /f
+
 :: Do not animate minimizing and maximizing windows
 reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MinAnimate" /t REG_SZ /d 0 /f
 
 :: Allow visual effects settings to apply
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d 3 /f
 reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /t REG_BINARY /d 9432078010000000 /f
+
+:: File association for .pow power plan files
+reg add "HKCR\powerscheme\DefaultIcon" /ve /t REG_SZ /d "%windir%\System32\powercpl.dll,1" /f
+reg add "HKCR\powerscheme\Shell\open\command" /ve /t REG_SZ /d "powercfg /import \"%1\"" /f
+reg add "HKCR\.pow" /ve /t REG_SZ /d "powerscheme" /f
+reg add "HKCR\.pow" /v "FriendlyTypeName" /t REG_SZ /d "Power Scheme" /f
 
 :: Do not auto install teams
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v "ConfigureChatAutoInstall" /t REG_DWORD /d 0 /f
