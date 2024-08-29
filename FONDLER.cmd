@@ -1,7 +1,6 @@
 @setlocal DisableDelayedExpansion
 @echo off &title commence the fondling
 
-:: most of this file is ripped from MAS
 :: Thank you to awuctl and lyssa for the ideas
 ::===============================================================================
 
@@ -108,9 +107,6 @@ if not exist "%SystemRoot%\Temp\" mkdir "%SystemRoot%\Temp" 1>nul 2>nul
 
 ::========================================================================================================================================
 
-:: HKCU entries will also be propagated to new users:
-reg load HKU\New "%SystemDrive%\Users\Default\NTUSER.DAT" >nul && set "HKU=1" || set "HKU="
-
 :: Disable cortana (not present anyways on modern windows)
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortana /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCortanaInAAD /t REG_DWORD /d 0 /f
@@ -120,17 +116,15 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v CortanaConsen
 @set "rule=%rule%\SystemApps\Microsoft.Windows.Cortana_cw5n1h2txyewy\searchUI.exe|Name=Block outbound Cortana|"
 reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsFirewall\FirewallRules" /f /v {0DE40C8E-C126-4A27-9371-A27DAB1039F7} /d "%rule%" 
 
-:: Disable web and location-based search (education/enterprise only)
+:: Disable web and location-based search
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowSearchToUseLocation /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v DisableWebSearch /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v ConnectedSearchUseWeb /t REG_DWORD /d 0 /f
-reg add "HKLM\Software\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsSpotlightFeatures /t REG_DWORD /d 1 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v BingSearchEnabled /t REG_DWORD /d 0 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v AllowSearchToUseLocation /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v AllowCloudSearch /t REG_DWORD /d 0 /f
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v SearchboxTaskbarMode /t REG_DWORD /d 1 /f
 
-:: Don't add search box back to taskbar
+:: Remove search box from taskbar and prevent microsoft from randomly putting it back
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v SearchboxTaskbarMode /t REG_DWORD /d 1 /f
 reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f
 reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v SearchBoxDisabledReason /t REG_SZ /d FromServer /f
 
@@ -138,12 +132,23 @@ reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v SearchBoxDisabled
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v EnableDynamicContentInWSB /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\SearchSettings" /v IsDynamicSearchBoxEnabled /t REG_DWORD /d 0 /f
 
-:: Disable Windows Spotlight and ads on lock screen (education/enterprise only)
+:: Disable Windows Spotlight and ads on lock screen
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v LockScreenOverlaysDisabled /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableCloudOptimizedContent /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableCloudOptimizedContent /t REG_DWORD /d 1 /f
 reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsSpotlightFeatures /t REG_DWORD /d 1 /f
-reg add "HKU\New\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /f /v DisableWindowsSpotlightFeatures /d 1 /t REG_DWORD
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v RotatingLockScreenEnabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsSpotlightWindowsWelcomeExperience /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsSpotlightOnActionCenter /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsSpotlightOnSettings /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableThirdPartySuggestions /t REG_DWORD /d 1 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v RotatingLockScreenOverlayEnabled /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338387Enabled /d 0 /t REG_DWORD
+
+:: Disable about this wallpaper icon on the desktop
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v {2cc5ca98-6485-489a-920e-b3e88a6ccce3} /t REG_DWORD /d 1 /f
+
+:: Disable lock screen wallpaper slideshow
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v RotatingLockScreenEnabled /t REG_DWORD /d 0 /f
 
 :: Disable find my device
 reg add "HKLM\SOFTWARE\Policies\Microsoft\FindMyDevice" /v AllowFindMyDevice /t REG_DWORD /d 0 /f
@@ -155,7 +160,6 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" /v DisabledBy
 
 :: Don't let websites access locally installed language list
 reg add "HKCU\Control Panel\International\User Profile" /v HttpAcceptLanguageOptOut /t REG_DWORD /d 1 /f
-reg add "HKU\New\Control Panel\International\User Profile" /f /v HttpAcceptLanguageOptOut /d 1 /t REG_DWORD
 
 :: Disable Windows tips
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SoftLandingEnabled /t REG_DWORD /d 0 /f
@@ -189,7 +193,6 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v SealSecu
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v SignSecureChannel /t REG_DWORD /d 1 /f
 
 :: Opt out of advertising and data collection
-reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableCloudOptimizedContent /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsConsumerFeatures /t REG_DWORD /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-202913Enabled /d 0 /t REG_DWORD
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-202914Enabled /d 0 /t REG_DWORD
@@ -212,7 +215,6 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-314566Enabled /d 0 /t REG_DWORD
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-314567Enabled /d 0 /t REG_DWORD
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338380Enabled /d 0 /t REG_DWORD
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338387Enabled /d 0 /t REG_DWORD
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338381Enabled /d 0 /t REG_DWORD
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338388Enabled /d 0 /t REG_DWORD
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /f /v SubscribedContent-338382Enabled /d 0 /t REG_DWORD
@@ -287,17 +289,21 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\SettingSync" /v DisableSetting
 :: Turn desktop wallpaper encoding quality to maximum, although it still looks like garbage because you cant turn off the chroma subsampling (i hate windows if you cant tell already)
 reg add "HKCU\Control Panel\Desktop" /v JPEGImportQuality /t REG_DWORD /d 100 /f
 
-:: Disable right click menu delay
+:: Disable context menu delay
 reg add "HKCU\Control Panel\Desktop" /v MenuShowDelay /t REG_SZ /d "0" /f
+
+:: Restore classic context menu (Windows 11)
+reg add "HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /ve /t REG_SZ /d "" /f
 
 :: Disable Windows ink workspace
 reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace" /v AllowWindowsInkWorkspace /t REG_DWORD /d 0 /f
 reg add "HKLM\Software\Policies\Microsoft\WindowsInkWorkspace" /v AllowSuggestedAppsInWindowsInkWorkspace /t REG_DWORD /d 0 /f
 
-:: Disable widgets and remove icon on taskbar (Windows 11)
+:: Disable widgets and remove icon on taskbar (and news and intrests on Windows 10)
 reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\AllowNewsAndInterests" /t REG_DWORD /v value /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /t REG_DWORD /v AllowNewsAndInterests /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarDa /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /v EnableFeeds /t REG_DWORD /d 0 /f
 
 :: Disable Copilot
 reg add "HKCU\Software\Policies\Microsoft\Windows\WindowsCopilot" /t REG_DWORD /v TurnOffWindowsCopilot /d 1 /f
@@ -321,15 +327,12 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /f /v AllowCrossDevice
 
 :: Disable "Tailored Experiences" with diagnostic data
 reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableTailoredExperiencesWithDiagnosticData /t REG_DWORD /d 1 /f
-reg add "HKU\New\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /f /v DisableTailoredExperiencesWithDiagnosticData /d 1 /t REG_DWORD
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsConsumerFeatures /t REG_DWORD /d 1 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Privacy" /v TailoredExperiencesWithDiagnosticDataEnabled /t REG_DWORD /d 0 /f
 
 :: Disable spelling data collection
 reg add "HKCU\Software\Microsoft\InputPersonalization" /v RestrictImplicitTextCollection /t REG_DWORD /d 1 /f
 reg add "HKCU\Software\Microsoft\InputPersonalization" /v RestrictImplicitInkCollection /t REG_DWORD /d 1 /f
-reg add "HKU\New\Software\Microsoft\InputPersonalization" /f /v RestrictImplicitInkCollection /d 1 /t REG_DWORD
-reg add "HKU\New\Software\Microsoft\InputPersonalization" /f /v RestrictImplicitTextCollection /d 1 /t REG_DWORD
 
 :: Disable "continuing experiences on other devices"
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /f /v EnableCdp /d 0 /t REG_DWORD
@@ -340,7 +343,6 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\System" /v UploadUserActivitie
 reg add "HKLM\Software\Policies\Microsoft\Windows\DataCollection" /v DoNotShowFeedbackNotifications /t REG_DWORD /d 1 /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\System" /v EnableActivityFeed /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /v EnableFeeds /t REG_DWORD /d 0 /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\DataCollection" /v DisableOneSettingsDownloads /t REG_DWORD /d 1 /f
 
 :: Disable app crash telemetry (goes to Microsoft, not app developers)
@@ -433,6 +435,9 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\SmartActionPlatform\Smar
 :: Change icon cache maximum size to 32MB
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v MaxCachedIcons /t REG_DWORD /d 32768 /f
 
+:: Enable taskbar icon cache
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM" /v AlwaysHibernateThumbnails /t REG_DWORD /d 1 /f
+
 :: Disable automatic appx app archiving
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Appx" /v AllowAutomaticAppArchiving /t REG_DWORD /d 0 /f
 
@@ -441,7 +446,35 @@ reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v RestartNotificationsAllowed2 /t REG_DWORD /d 0 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v SetUpdateNotificationLevel /t REG_DWORD /d 2 /f
 
-:: 
+:: Disable associated app icons on thumbnails
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTypeOverlay /t REG_DWORD /d 0 /f
+
+:: Remove "3D Objects" folder
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" /f
+reg delete "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" /f
+del "%USERPROFILE%\3D Objects"
+
+:: Remove "Gallery" from explorer
+reg add "HKCU\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v System.IsPinnedToNameSpaceTree /t REG_DWORD /d 0 /f
+
+:: Enable verbose log in/out and power on/off messages
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v verbosestatus /t REG_DWORD /d 0 /f
+
+:: Do not animate minimizing and maximizing windows
+reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v MinAnimate /t REG_SZ /d 0 /f
+
+:: Allow visual effects settings to apply
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 3 /f
+reg add "HKCU\Control Panel\Desktop" /v UserPreferencesMask /t REG_BINARY /d 9432078010000000 /f
+
+:: Do not auto install teams
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v ConfigureChatAutoInstall /t REG_DWORD /d 0 /f
+
+:: Make bootloader use actual screen resolution
+bcdedit /set {globalsettings} highestmode true
+
+:: Explicitly enable startup repair
+bcdedit /set {current} bootstatuspolicy DisplayAllFailures
 
 :: Enable hibernation
 powercfg /h on
@@ -508,6 +541,9 @@ set packages[51]=Windows.ContactSupport
 set packages[52]=Windows.DevHome
 set packages[53]=Microsoft.PowerAutomateDesktop
 set packages[54]=MSTeams
+set packages[55]=msteams
+set packages[56]=MicrosoftTeams
+set packages[57]=Microsoft.Copilot
 
 set count=1
 
@@ -534,7 +570,7 @@ for /l %%i in (1,1,%count%-1) do (
 endlocal
 
 :: Remove legacy internet explorer if it is installed
-powershell -Command "Get-WindowsCapability -Online Browser.InternetExplorer | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
+powershell -Command "Remove-WindowsCapability -Name Browser.InternetExplorer -NoRestart -Online -ErrorAction 'Continue'"
 
 :: Remove Exchange ActiveSync
 powershell -Command "Get-WindowsCapability -Online OneCoreUAP.OneSync | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
@@ -543,11 +579,14 @@ powershell -Command "Get-WindowsCapability -Online OneCoreUAP.OneSync | Remove-W
 powershell -Command "Get-WindowsCapability -Online Tpm.TpmDiagnostics | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
 
 :: Enable DirectPlay (for games)
-powershell -Command "Enable-WindowsOptionalFeature –FeatureName 'DirectPlay' -All -Online"
+powershell -Command "Enable-WindowsOptionalFeature –FeatureName 'DirectPlay' -NoRestart -All -Online"
 
 :: Re-register start menu (fixes random error)
 powershell -Command "Stop-Process -Name 'StartMenuExperienceHost' -Force"
 powershell -Command "Get-AppxPackage -AllUsers Microsoft.Windows.ShellExperienceHost | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register '$($_.InstallLocation)\AppXManifest.xml'}"
+
+:: Cleanup component store
+dism /Online  /Cleanup-Image /StartComponentCleanup
 
 :: Enable TCP BBR2 congestion algorithm (will only work on Windows 11, will throw errors otherwise)
 netsh int tcp set supplemental Template=Internet CongestionProvider=bbr2
