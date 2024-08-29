@@ -238,6 +238,7 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Sh
 
 :: Disable start menu suggested apps
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_IrisRecommendations /t REG_DWORD /d 0 /f
 
 :: Disallow automatic app installs and app suggestions (must be applied pre-install or it will only apply for new users)
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f
@@ -313,6 +314,7 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /f /v AllowCrossDevice
 reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableTailoredExperiencesWithDiagnosticData /t REG_DWORD /d 1 /f
 reg add "HKU\New\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /f /v DisableTailoredExperiencesWithDiagnosticData /d 1 /t REG_DWORD
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsConsumerFeatures /t REG_DWORD /d 1 /f
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Privacy" /v TailoredExperiencesWithDiagnosticDataEnabled /t REG_DWORD /d 0 /f
 
 :: Disable spelling data collection
 reg add "HKCU\Software\Microsoft\InputPersonalization" /v RestrictImplicitTextCollection /t REG_DWORD /d 1 /f
@@ -375,6 +377,9 @@ reg add "HKLM\SOFTWARE\Microsoft\OneDrive" /v PreventNetworkTrafficPreUserSignIn
 :: Disable Onedrive
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v DisableFileSyncNGSC /t REG_DWORD /d 1 /f
 
+:: Disable Onedrive user folder intrgration
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\OneDrive" /v KFMBlockOptIn /t REG_DWORD /d 1 /f
+
 :: Disable speech and handwriting telemetry when using accessibility features
 reg add "HKLM\SOFTWARE\Policies\Microsoft\InputPersonalization" /v AllowInputPersonalization /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Microsoft\InputPersonalization" /v RestrictImplicitInkCollection /t REG_DWORD /d 1 /f
@@ -412,6 +417,12 @@ reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Ad
 
 :: Disable most used apps in start menu for all users (Windows 11)
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v ShowOrHideMostUsedApps /t REG_DWORD /d 2 /f
+
+:: Disable suggested text actions
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\SmartActionPlatform\SmartClipboard" /v Disabled /t REG_DWORD /d 1 /f
+
+:: Change icon cache maximum size to 32MB
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v MaxCachedIcons /t REG_DWORD /d 32768 /f
 
 :: 
 
@@ -502,8 +513,17 @@ for /l %%i in (1,1,%count%-1) do (
 
 endlocal
 
-:: Remove legacy internet explorer if it is installed (security risk)
+:: Remove legacy internet explorer if it is installed
 powershell -Command "Get-WindowsCapability -Online Browser.InternetExplorer | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
+
+:: Remove Exchange ActiveSync
+powershell -Command "Get-WindowsCapability -Online OneCoreUAP.OneSync | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
+
+:: Remove TPM Diagnostics app
+powershell -Command "Get-WindowsCapability -Online Tpm.TpmDiagnostics | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
+
+:: Enable DirectPlay (for games)
+powershell -Command "Enable-WindowsOptionalFeature –FeatureName 'DirectPlay' -All -Online"
 
 :: Re-register start menu (fixes random error)
 powershell -Command "Stop-Process -Name 'StartMenuExperienceHost' -Force"
