@@ -717,6 +717,9 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel\Na
 :: Drop Windows Platform Binary Tables, which allow hardware to force the loading of software on every boot using an ACPI table
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v "DisableWpbtExecution" /t REG_DWORD /d 1 /f
 
+:: Network drives over UAC
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLinkedConnections" /t REG_DWORD /d 1 /f
+
 :: Configure kernel panic to dump useful info
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\CrashControl" /v "AutoReboot" /t REG_DWORD /d 0 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\CrashControl" /v "CrashDumpEnabled" /t REG_DWORD /d 0 /f
@@ -739,6 +742,17 @@ schtasks /Change /TN "\Microsoft\Windows\DiskCleanup\SilentCleanup" /ENABLE
 :: Unrestrict powershell execution policy
 reg add "HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" /v "ExecutionPolicy" /t REG_SZ /d "Unrestricted" /f
 
+
+:: Telemetry serviecs
+sc config OneSyncSvc start= disabled
+sc config TrkWks start= disabled
+sc config PcaSvc start= disabled
+sc config DiagTrack start= disabled
+sc config diagnosticshub.standardcollector.service start= disabled
+sc config WerSvc start= disabled
+sc config wercplsupport start= disabled
+sc config UCPD start= disabled
+sc config Telemetry start= disabled
 
 :: Configure NTP
 sc start w32time
