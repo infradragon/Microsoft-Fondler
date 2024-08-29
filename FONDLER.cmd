@@ -570,14 +570,13 @@ for /l %%i in (1,1,%count%-1) do (
 endlocal
 
 :: Remove legacy internet explorer if it is installed
-powershell -Command "Remove-WindowsCapability -Name Browser.InternetExplorer -NoRestart -Online -ErrorAction 'Continue'"
+powershell -Command "Get-WindowsCapability -Online Browser.InternetExplorer* | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
 
 :: Remove Exchange ActiveSync
-powershell -Command "Get-WindowsCapability -Online OneCoreUAP.OneSync | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
+powershell -Command "Get-WindowsCapability -Online OneCoreUAP.OneSync* | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
 
 :: Remove TPM Diagnostics app
-powershell -Command "Get-WindowsCapability -Online Tpm.TpmDiagnostics | Remove-WindowsCapability -Online -ErrorAction 'Continue'"
-
+powershell -Command "Get-WindowsCapability -Online Tpm.TpmDiagnostics* | Remove-WindowsCapability -NoRestart -Online -ErrorAction 'Continue'"
 :: Enable DirectPlay (for games)
 powershell -Command "Enable-WindowsOptionalFeature –FeatureName 'DirectPlay' -NoRestart -All -Online"
 
