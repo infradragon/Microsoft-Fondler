@@ -804,6 +804,9 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" /v 256 /t REG_DWORD /d 30 /f
 schtasks /Change /TN "\Microsoft\Windows\DiskCleanup\SilentCleanup" /ENABLE
 
+:: Delay appx autoremoval until after user logon becaus I dont trust Microsoft to do it right
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\Setup\Upgrade\Appx\Applications" /v "NoReRegisterOnUpgrade" /t REG_DWORD /d 1 /f
+
 :: Unrestrict powershell execution policy
 reg add "HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" /v "ExecutionPolicy" /d "Unrestricted" /t REG_SZ /f
 
