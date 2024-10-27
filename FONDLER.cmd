@@ -810,7 +810,7 @@ reg add "HKEY_LOCAL_MACHINE\SYSTEM\Setup\Upgrade\Appx\Applications" /v "NoReRegi
 :: Unrestrict powershell execution policy
 reg add "HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" /v "ExecutionPolicy" /d "Unrestricted" /t REG_SZ /f
 
-:: Telemetry serviecs
+:: Telemetry services
 sc config OneSyncSvc start= disabled
 sc config TrkWks start= disabled
 sc config PcaSvc start= disabled
