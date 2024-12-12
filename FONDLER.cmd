@@ -448,6 +448,9 @@ reg add "HKCU\Software\Policies\Microsoft\office\16.0\common" /v "sendcustomerda
 reg add "HKCU\Software\Policies\Microsoft\office\16.0\common" /v "qmenable" /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Policies\Microsoft\office\common\clienttelemetry" /v "sendtelemetry" /t REG_DWORD /d 3 /f
 
+:: Disable Sign-in button at the top of office apps
+reg add "HKCU\Software\Microsoft\Office\16.0\Common\SignIn" /v "SignInOptions" /t REG_DWORD /d 3 /f
+
 :: Disable Activity Feed in Task View (it's an online feature)
 reg add "HKLM\Software\Policies\Microsoft\Windows\System" /v "EnableActivityFeed" /t REG_DWORD /d 0 /f
 
