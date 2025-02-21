@@ -437,7 +437,7 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\CPSS\Store\TailoredExper
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "MaxTelemetryAllowed" /t REG_DWORD /d 0 /f
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Privacy" /v "TailoredExperiencesWithDiagnosticDataEnabled" /t REG_DWORD /d 0 /f
-reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Shell\Update\TelemetryID" /v TelemetryID /t REG_SZ /d 0000000000000000 /f
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Shell\\TelemetryID" /v TelemetryID /t REG_SZ /d 0000000000000000 /f
 
 :: Disable Customer Experience Improvement Program (more telemetry)
 reg add "HKLM\SOFTWARE\Policies\Microsoft\AppV\CEIP" /v "CEIPEnable" /t REG_DWORD /d 0 /f
@@ -507,7 +507,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" /v "Us
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers" /v "AddPrinterDrivers" /t REG_DWORD /d 1 /f
 
 :: Prevent DevHome from being installed via WU
-reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\DevHomeUpdate" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\Orchestrator\UScheduler_Oobe\DevHomeUpdate" /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\UScheduler\DevHomeUpdate" /v "workCompleted" /t REG_DWORD /d 1 /f
 
 :: Prevent Outlook from being installed via WU
@@ -627,6 +627,9 @@ reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v "HideMCTLink" /t 
 
 :: Disable Windows Update auto restart (unless system is logged out)
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoRebootWithLoggedOnUsers" /t REG_DWORD /d 1 /f
+
+:: Install feature updates with known compatibility issues
+reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "DisableWUfBSafeguards" /t REG_DWORD /d 1 /f
 
 :: Disable associated app icons on thumbnails
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTypeOverlay" /t REG_DWORD /d 0 /f
