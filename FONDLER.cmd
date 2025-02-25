@@ -659,7 +659,7 @@ reg add "HKLM\SOFTWARE\Microsoft\WindowsRuntime\ActivatableClassId\Windows.Gamin
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v "value" /t REG_DWORD /d 0 /f
 
-:: Configure MMCSS to allocate all cpu resources to background apps
+:: Configure MMCSS to allocate all cpu resources to background apps https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service#registry-settings
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d 100 /f
 
 :: Windows Search Indexing respects power modes 
@@ -682,6 +682,9 @@ del "%USERPROFILE%\3D Objects"
 
 :: Remove "Gallery" from explorer
 reg add "HKCU\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f
+
+:: Stop explorer from automatically discovering folder content type
+reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell" /v "FolderType" /t REG_SZ /d "NotSpecified" /f
 
 :: Enable verbose log in/out and power on/off messages
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "verbosestatus" /t REG_DWORD /d 0 /f
@@ -854,6 +857,11 @@ reg add "HKEY_LOCAL_MACHINE\SYSTEM\Setup\Upgrade\Appx\Applications" /v "NoReRegi
 :: Unrestrict powershell execution policy
 reg add "HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" /v "ExecutionPolicy" /d "Unrestricted" /t REG_SZ /f
 
+:: Disable Fault Tolerant Heap https://docs.microsoft.com/en-us/windows/win32/win7appqual/fault-tolerant-heap
+rundll32 fthsvc.dll,FthSysprepSpecialize
+reg add "HKLM\SOFTWARE\Microsoft\FTH" /v "Enabled" /t REG_DWORD /d 0 /f
+
+
 :: Telemetry services
 sc config OneSyncSvc start= disabled
 sc config TrkWks start= disabled
@@ -890,7 +898,7 @@ del "%ProgramData%\Microsoft\Diagnosis\ETLLogs\AutoLogger\DiagTrack*" "%ProgramD
 :: Set ps1 files to open with powershell (duh)
 ftype Microsoft.PowerShellScript.1="%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoLogo -EP Unrestricted -File "%1" %*
 
-:: Disable 8dot3 character-length file names (for C: drive only)
+:: Disable 8dot3 character-length file names (for C: drive only) ttps://ttcshelbyville.wordpress.com/2018/12/02/should-you-disable-8dot3-for-performance-and-security
 fsutil 8dot3name set c: 1
 fsutil 8dot3name strip /s /v c:
 
