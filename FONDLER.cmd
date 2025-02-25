@@ -787,7 +787,11 @@ reg add "HKCU\Software\Classes\ms-officeapp\Shell\Open\Command" /d "rundll32" /t
 :: Disable memory dump from devices
 reg add "HKLM\System\ControlSet001\Control\CrashControl\StorageTelemetry" /v "DeviceDumpEnabled" /t REG_DWORD /d 0 /f
 
-:: Dont reduce sound volume in calls
+:: Dont reduce	
+fix(onedrive): don't strip if files exist
+	
+Nov 29, 2023
+PFP.ps1 sound volume in calls
 reg add "HKCU\SOFTWARE\Microsoft\Multimedia\Audio" /v "UserDuckingPreference" /t REG_DWORD /d 3 /f
 
 :: ewww yucky spell checking
@@ -950,8 +954,9 @@ set packages[54]=MSTeams
 set packages[55]=msteams
 set packages[56]=MicrosoftTeams
 set packages[57]=Microsoft.Copilot
+set packages[58]=Disney.37853FC22B2CE
 :: This is Paint 3D, NOT the real MS Paint
-set packages[58]=Microsoft.MSPaint
+set packages[59]=Microsoft.MSPaint
 
 set count=1
 
