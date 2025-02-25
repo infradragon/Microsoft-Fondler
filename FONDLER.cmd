@@ -498,6 +498,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration" /v 
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" /v "Value" /t REG_SZ /d "Deny" /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{E6AD100E-5F4E-44CD-BE0F-2265D88D14F5}" /v "Value" /t REG_SZ /d "Deny" /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" /v "SensorPermissionState" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" /v "ShowGlobalPrompts" /t REG_DWORD /d 0 /f
 
 :: Disable human presence tracking
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessHumanPresence" /t "REG_DWORD" /d 2 /f
@@ -656,7 +657,7 @@ reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\All
 :: Configure MMCSS to allocate all cpu resources to background apps
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d 100 /f
 
-:: Windows Search Indexing respects power modes
+:: Windows Search Indexing respects power modes 
 reg add "HKLM\Software\Microsoft\Windows Search\Gather\Windows\SystemIndex" /v "RespectPowerModes" /t REG_DWORD /d 1 /f
 
 :: Short quantum, variable, no foreground boost https://docs.google.com/document/d/1c2-lUJq74wuYK1WrA_bIvgb89dUN0sj8-hO3vqmrau4/edit
@@ -849,6 +850,13 @@ sc config WerSvc start= disabled
 sc config wercplsupport start= disabled
 sc config UCPD start= disabled
 sc config Telemetry start= disabled
+
+:: Location services
+sc config lfsvc start= disabled
+sc config MapsBroker start= disabled
+
+:: Disable netbios
+sc config NetBT start= disabled
 
 :: Configure NTP
 sc start w32time
