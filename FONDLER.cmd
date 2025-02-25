@@ -269,7 +269,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "S
 :: Disable start menu suggested websites
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "HideRecommendedPersonalizedSites" /t REG_DWORD /d 1 /f
 
-:: Disallow automatic app installs and app suggestions (must be applied pre-install or it will only apply for new users)
+:: Disallow automatic app installs and app suggestions (must be applied pre-install or it will only apply for new users and windows updates)
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SystemPaneSuggestionsEnabled" /t REG_DWORD /d 0 /f
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SilentInstalledAppsEnabled" /t REG_DWORD /d 0 /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "ContentDeliveryAllowed" /t REG_DWORD /d 0 /f
@@ -292,7 +292,7 @@ reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\System" /v "AllowExperime
 :: Disable A/B testing
 reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\System\AllowExperimentation" /v "Value" /t REG_DWORD /d 0 /f
 
-:: Disable CDM changing settings
+:: Stop CDM changing its settings on update
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RemediationRequired" /t REG_DWORD /d 0 /f
 
 :: Show hidden files and file extensions
