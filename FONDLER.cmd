@@ -205,23 +205,23 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked
 reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" /v "{1d27f844-3a1f-4410-85ac-14651078412d}" /t REG_SZ /d "" /f
 
 :: Remove "Include in Library" from context menu
-reg delete "HKCR\Folder\ShellEx\ContextMenuHandlers\Library Location"
+reg delete "HKCR\Folder\ShellEx\ContextMenuHandlers\Library Location" /f
 
 :: Remove bitmap (.bmp) and rtf option from new context menu
-reg delete "HKCR\.bmp\ShellNew"
-reg delete "HKCR\.rtf\ShellNew"
+reg delete "HKCR\.bmp\ShellNew" /f
+reg delete "HKCR\.rtf\ShellNew" /f
 
 :: Remove modern share sheet from context menu
-reg delete "HKCR\*\shellex\ContextMenuHandlers\ModernSharing"
-reg delete "HKCR\AllFilesystemObjects\shellex\ContextMenuHandlers\ModernSharing"
+reg delete "HKCR\*\shellex\ContextMenuHandlers\ModernSharing" /f
+reg delete "HKCR\AllFilesystemObjects\shellex\ContextMenuHandlers\ModernSharing" /f
 
 :: Remove Google Drive FS context menu items
-reg delete "HKEY_CLASSES_ROOT\.gdoc\ShellNew"
-reg delete "HKEY_CLASSES_ROOT\.gsheet\ShellNew"
-reg delete "HKEY_CLASSES_ROOT\.gslides\ShellNew"
-reg delete "HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\GDContextMenu"
-reg delete "HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\GDContextMenu"
-reg delete "HKEY_CLASSES_ROOT\lnkfile\shellex\ContextMenuHandlers\GDContextMenu"
+reg delete "HKEY_CLASSES_ROOT\.gdoc\ShellNew" /f
+reg delete "HKEY_CLASSES_ROOT\.gsheet\ShellNew" /f
+reg delete "HKEY_CLASSES_ROOT\.gslides\ShellNew" /f
+reg delete "HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\GDContextMenu" /f
+reg delete "HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\GDContextMenu" /f
+reg delete "HKEY_CLASSES_ROOT\lnkfile\shellex\ContextMenuHandlers\GDContextMenu" /f
 
 :: Don't automatically connect to open hotspots
 reg add "HKLM\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config" /v "AutoConnectAllowedOEM" /t REG_DWORD /d 0 /f
