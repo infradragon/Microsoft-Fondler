@@ -194,6 +194,33 @@ reg delete "HKCR\CLSID\{09A47860-11B0-4DA5-AFA5-26D86198A780}" /f
 reg delete "HKCR\Directory\shellex\ContextMenuHandlers\EPP" /f
 reg delete "HKCR\Drive\shellex\ContextMenuHandlers\EPP" /f
 
+:: Remove "Cast to device" from context menu
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" /v "{7AD84985-87B4-4a16-BE58-8B72A5B390F7}" /t REG_SZ /d "" /f
+reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" /v "{7AD84985-87B4-4a16-BE58-8B72A5B390F7}" /t REG_SZ /d "" /f
+
+:: Remove "Troubleshoot compatibility" from context menu
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" /v "{1d27f844-3a1f-4410-85ac-14651078412d}" /t REG_SZ /d "" /f
+reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" /v "{1d27f844-3a1f-4410-85ac-14651078412d}" /t REG_SZ /d "" /f
+
+:: Remove "Include in Library" from context menu
+reg delete "HKCR\Folder\ShellEx\ContextMenuHandlers\Library Location"
+
+:: Remove bitmap (.bmp) and rtf option from new context menu
+reg delete "HKCR\.bmp\ShellNew"
+reg delete "HKCR\.rtf\ShellNew"
+
+:: Remove modern share sheet from context menu
+reg delete "HKCR\*\shellex\ContextMenuHandlers\ModernSharing"
+reg delete "HKCR\AllFilesystemObjects\shellex\ContextMenuHandlers\ModernSharing"
+
+:: Remove Google Drive FS context menu items
+reg delete "HKEY_CLASSES_ROOT\.gdoc\ShellNew"
+reg delete "HKEY_CLASSES_ROOT\.gsheet\ShellNew"
+reg delete "HKEY_CLASSES_ROOT\.gslides\ShellNew"
+reg delete "HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\GDContextMenu"
+reg delete "HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\GDContextMenu"
+reg delete "HKEY_CLASSES_ROOT\lnkfile\shellex\ContextMenuHandlers\GDContextMenu"
+
 :: Don't automatically connect to open hotspots
 reg add "HKLM\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config" /v "AutoConnectAllowedOEM" /t REG_DWORD /d 0 /f
 
@@ -694,7 +721,6 @@ reg add "HKCU\Control Panel\Accessibility\StickyKeys" /v "Flags" /t REG_DWORD /d
 reg add "HKCU\Control Panel\Accessibility\ToggleKeys" /v "Flags" /t REG_DWORD /d 0 /f
 reg add "HKCU\Control Panel\Accessibility\MouseKeys" /v "Flags" /t REG_DWORD /d 0 /f
 reg add "HKCU\Control Panel\Accessibility\Keyboard Response" /v "Flags" /t REG_DWORD /d 0 /f
-reg add "HKCU\Control Panel\Accessibility\HighContrast" /v "Flags" /t REG_DWORD /d 0 /f
 
 :: Disable flashes and sounds for sticky keys and other accessibility features
 reg add "HKCU\Control Panel\Accessibility" /v "Warning Sounds" /t REG_DWORD /d 0 /f
