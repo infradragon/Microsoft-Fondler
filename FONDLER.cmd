@@ -427,7 +427,7 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "NoC
 :: Don't prompt to "fix" usb devices
 reg add "HKCU\SOFTWARE\Microsoft\Shell\USB" /v "NotifyOnUsbErrors" /t REG_DWORD /d 1 /f
 
-:: Disable autoplay
+:: Disable autoplay/autorun for removable drives
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" /v "DisableAutoplay" /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" /v "DisableAutoplay" /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v "NoAutoplayfornonVolume" /t REG_DWORD /d 1 /f
@@ -590,6 +590,9 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncN
 :: Disable Onedrive user folder intrgration
 reg add "HKLM\SOFTWARE\Policies\Microsoft\OneDrive" /v "KFMBlockOptIn" /t REG_DWORD /d 1 /f
 
+:: Don't show Office files in quick access
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowCloudFilesInQuickAccess" /t REG_DWORD /d 0 /f
+
 :: Stop SPP from validating tickets
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform" /v "NoGenTicket" /t REG_DWORD /d 1 /f
 
@@ -612,6 +615,9 @@ reg add "HKCU\SOFTWARE\Microsoft\Input\Settings" /v "InsightsEnabled" /t REG_DWO
 :: Never show feedback notifications
 reg add "HKCU\SOFTWARE\Microsoft\Siuf\Rules" /v "NumberOfSIUFInPeriod" /t REG_DWORD /d 0 /f
 reg add "HKCU\SOFTWARE\Microsoft\Siuf\Rules" /v "PeriodInNanoSeconds" /t REG_DWORD /d 0 /f
+
+:: Don't show miracast quick access tile
+powershell -c "New-ItemProperty -Path 'HKCU:\Control Panel\Quick Actions\Control Center\Unpinned' -Name 'Microsoft.QuickAction.NearShare' -PropertyType None -Value ([byte[]]@()) -Force"
 
 :: New boot logo yippee
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\BootControl" /v "BootProgressAnimation" /t REG_DWORD /d 1 /f
@@ -641,7 +647,7 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "ShowOrHideMostUs
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\SmartActionPlatform\SmartClipboard" /v "Disabled" /t REG_DWORD /d 1 /f
 
 :: Change icon cache maximum size to 32MB
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v "MaxCachedIcons" /t REG_DWORD /d 32768 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v "MaxCachedIcons" /t REG_SZ /d "32768" /f
 
 :: Enable taskbar icon cache
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM" /v "AlwaysHibernateThumbnails" /t REG_DWORD /d 1 /f
@@ -709,8 +715,11 @@ reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\N
 reg delete "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" /f
 del "%USERPROFILE%\3D Objects"
 
-:: Remove "Gallery" from explorer
+:: Remove "Gallery" folder from Windows 11 file explorer
 reg add "HKCU\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f
+
+:: Don't track recently and most opened files on remote locations
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "NoRemoteDestinations" /t REG_DOWD /d 1 /f
 
 :: Stop explorer from automatically discovering folder content type
 reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell" /v "FolderType" /t REG_SZ /d "NotSpecified" /f
@@ -749,8 +758,8 @@ reg add "HKLM\SOFTWARE\WOW6432Node\Classes\CLSID\{1d64637d-31e9-4b06-9124-e83fb1
 :: Disable explorer check boxes
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "AutoCheckSelect" /t REG_DWORD /d 0 /f
 
-:: Explorer home page is "This PC"
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LaunchTo" /t REG_DWORD /d 0 /f
+:: Explorer home page set to "This PC"
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LaunchTo" /t REG_DWORD /d 1 /f
 
 :: Disable sharing wizard
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "SharingWizardOn" /t REG_DWORD /d 0 /f
@@ -910,7 +919,7 @@ sc config NetBT start= disabled
 
 :: Configure NTP
 sc start w32time
-w32tm /config /syncfromflags:manual /manualpeerlist:"time.cloudflare.com 0.us.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org"
+w32tm /config /syncfromflags:manual /manualpeerlist:"time.cloudflare.com 0.us.pool.ntp.org 1.us.pool.ntp.org 2.us.pool.ntp.org"
 w32tm /config /update
 w32tm /resync
 
