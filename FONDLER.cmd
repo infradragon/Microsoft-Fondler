@@ -898,9 +898,10 @@ del "%ProgramData%\Microsoft\Diagnosis\ETLLogs\AutoLogger\DiagTrack*" "%ProgramD
 :: Set ps1 files to open with powershell (duh)
 ftype Microsoft.PowerShellScript.1="%windir%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoLogo -EP Unrestricted -File "%1" %*
 
-:: Disable 8dot3 character-length file names (for C: drive only) ttps://ttcshelbyville.wordpress.com/2018/12/02/should-you-disable-8dot3-for-performance-and-security
+:: Disable 8dot3 character-length file names ttps://ttcshelbyville.wordpress.com/2018/12/02/should-you-disable-8dot3-for-performance-and-security
 fsutil 8dot3name set c: 1
 fsutil 8dot3name strip /s /v c:
+fsutil behavior set disable8dot3 1
 
 :: Make bootloader use actual screen resolution
 bcdedit /set {globalsettings} highestmode true
