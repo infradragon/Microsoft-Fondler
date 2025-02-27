@@ -370,6 +370,9 @@ reg add "HKCU\Control Panel\Desktop" /v "JPEGImportQuality" /t REG_DWORD /d 100 
 :: Don't show network discoverable popup
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Network\NewNetworkWindowOff" /f
 
+:: Trade throughput for latency (to be tested further later, valid values 1-70)
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t REG_DWORD /d 10
+
 :: Disable delay for startup apps (Windows 10 only, Windows 11 uses WaitForIdleState)
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t REG_DWORD /d 0 /f
 
@@ -711,14 +714,8 @@ reg add "HKLM\SOFTWARE\Microsoft\WindowsRuntime\ActivatableClassId\Windows.Gamin
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v "value" /t REG_DWORD /d 0 /f
 
-:: Configure MMCSS to allocate all cpu resources to background apps https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service#registry-settings
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d 100 /f
-
 :: Windows Search Indexing respects power modes 
 reg add "HKLM\Software\Microsoft\Windows Search\Gather\Windows\SystemIndex" /v "RespectPowerModes" /t REG_DWORD /d 1 /f
-
-:: Short quantum, variable, no foreground boost https://docs.google.com/document/d/1c2-lUJq74wuYK1WrA_bIvgb89dUN0sj8-hO3vqmrau4/edit
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d 36 /f
 
 :: Disable SMB bandwidth throttling
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "DisableBandwidthThrottling" /t REG_DWORD /d 1 /f
@@ -736,7 +733,7 @@ del "%USERPROFILE%\3D Objects"
 reg add "HKCU\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f
 
 :: Don't track recently and most opened files on remote locations
-reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "NoRemoteDestinations" /t REG_DOWD /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "NoRemoteDestinations" /t REG_DWORD /d 1 /f
 
 :: Stop explorer from automatically discovering folder content type
 reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell" /v "FolderType" /t REG_SZ /d "NotSpecified" /f
@@ -959,11 +956,14 @@ fsutil behavior set disable8dot3 1
 :: Make bootloader use actual screen resolution
 bcdedit /set {globalsettings} highestmode true
 
-:: Explicitly enable startup repair
+:: Explicitly enable startup repair on unexpected shutdown
 bcdedit /set {current} bootstatuspolicy DisplayAllFailures
 
 :: Allow pressing f8 during startup for advanced options
 bcdedit /set {bootloadersettings} bootmenupolicy legacy
+
+:: Explicitly set the use of HPET (in bios) and dynamic ticking
+bcdedit /set useplatformtick No
 
 :: Enable hibernation
 powercfg /h on
@@ -1072,7 +1072,7 @@ set packages[28]=Microsoft.XboxGameOverlay
 set packages[29]=Microsoft.XboxGamingOverlay
 set packages[30]=Microsoft.YourPhone
 set packages[31]=Microsoft.ZuneMusic
-set packages[32]=Microsoft.ZuneVideo
+set packages[32]=Microsoft.ZuneVideo100
 set packages[33]=Microsoft.Messaging
 set packages[34]=MicrosoftCorporationII.MicrosoftFamily
 set packages[35]=Microsoft.OutlookForWindows
@@ -1164,11 +1164,33 @@ netsh int tcp set supplemental Template=InternetCustom CongestionProvider=bbr2
 :: Non-Battery
 if %dclass% EQU 2 goto d1end
 
+:: Configure MMCSS to allocate all cpu time to processes equally https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service#registry-settings (effectively disables MMCSS)
+:: https://github.com/djdallmann/GamingPCSetup/blob/master/CONTENT/RESEARCH/WINSERVICES/README.md#q-whats-actually-happening-inside-mmcss-on-a-millisecond-time-scale-what-variables-are-there-and-how-do-they-come-into-play
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d 50 /f
+
+:: Never let MMCSS go into idle mode
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NoLazyMode" /t REG_DWORD /d 1 /f
+
+:: Disable power throttling
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling" /v "PowerThrottlingOff" /t REG_DWORD /f /d 0
+
+:: Short quantum, variable (6:6) https://docs.google.com/document/d/1c2-lUJq74wuYK1WrA_bIvgb89dUN0sj8-hO3vqmrau4/edit
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d 36 /f
+
+
+
 :d1end
 
 ::========================================================================================================================================
 :: Battery
 if %dclass% EQU 1 goto d2end
+
+:: Configure MMCSS to allocate 10% cpu time to processes it deeems low priority https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service#registry-settings (effectively disables MMCSS)
+:: https://github.com/djdallmann/GamingPCSetup/blob/master/CONTENT/RESEARCH/WINSERVICES/README.md#q-whats-actually-happening-inside-mmcss-on-a-millisecond-time-scale-what-variables-are-there-and-how-do-they-come-into-play
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d 10 /f
+
+:: Short quantum, variable, 3x fg boost (18:6) https://docs.google.com/document/d/1c2-lUJq74wuYK1WrA_bIvgb89dUN0sj8-hO3vqmrau4/edit
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d 38 /f
 
 :d2end
 
