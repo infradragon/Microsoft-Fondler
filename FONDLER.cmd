@@ -109,6 +109,17 @@ if not exist "%SystemRoot%\Temp\" mkdir "%SystemRoot%\Temp" 1>nul 2>nul
 
 whoami /user | findstr /i /c:S-1-5-18 >nul || ( call :RunAsTI "%~f0" %* & exit /b )
 
+cls
+echo Device class:
+echo [1] Non-battery
+echo [2] Battery
+set /p "dclass=: "
+
+echo User level:
+echo [1] Sysadmin
+echo [2] Consumer
+set /p "uclass=: "
+
 :: Disable cortana (not present anyways on modern windows)
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v "AllowCortana" /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v "AllowCortanaInAAD" /t REG_DWORD /d 0 /f
@@ -904,7 +915,6 @@ reg add "HKLM\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" /v 
 rundll32 fthsvc.dll,FthSysprepSpecialize
 reg add "HKLM\SOFTWARE\Microsoft\FTH" /v "Enabled" /t REG_DWORD /d 0 /f
 
-
 :: Telemetry services
 sc config OneSyncSvc start= disabled
 sc config TrkWks start= disabled
@@ -1140,9 +1150,6 @@ winmgmt /resyncperf
 powershell -Command "Stop-Process -Name 'StartMenuExperienceHost' -Force"
 powershell -Command "Get-AppxPackage -AllUsers Microsoft.Windows.ShellExperienceHost | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register '$($_.InstallLocation)\AppXManifest.xml'}"
 
-:: Disable reserved storage https://www.ntlite.com/community/index.php?threads/discussion-reserved-storage.3327/
-dism /Online /Set-ReservedStorageState /State:Disabled
-
 :: Cleanup component store
 dism /Online  /Cleanup-Image /StartComponentCleanup
 
@@ -1152,6 +1159,33 @@ netsh int tcp set supplemental Template=Datacenter CongestionProvider=bbr2
 netsh int tcp set supplemental Template=Compat CongestionProvider=CUBIC
 netsh int tcp set supplemental Template=DatacenterCustom CongestionProvider=bbr2
 netsh int tcp set supplemental Template=InternetCustom CongestionProvider=bbr2
+
+::========================================================================================================================================
+:: Non-Battery
+if %dclass% EQU 2 goto d1end
+
+:d1end
+
+::========================================================================================================================================
+:: Battery
+if %dclass% EQU 1 goto d2end
+
+:d2end
+
+::========================================================================================================================================
+:: Sysadmin
+if %uclass% EQU 2 goto u1end
+
+:: Disable reserved storage https://www.ntlite.com/community/index.php?threads/discussion-reserved-storage.3327/
+dism /Online /Set-ReservedStorageState /State:Disabled
+
+:u1end
+
+::========================================================================================================================================
+:: Consumer
+if %uclass% EQU 1 goto u2end
+
+:u2end
 
 #:RunAsTI snippet to run as TI/System, with innovative HKCU load, ownership privileges, high priority, and explorer support
 set ^ #=& set "0=%~f0"& set 1=%*& powershell -c iex(([io.file]::ReadAllText($env:0)-split'#\:RunAsTI .*')[1])& exit /b
