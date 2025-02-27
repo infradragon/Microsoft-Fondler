@@ -136,7 +136,7 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "AllowSearchT
 :: Remove search box/search icon from taskbar and prevent microsoft from randomly putting it back
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 0 /f
 reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "DisableSearchBoxSuggestions" /t REG_DWORD /d 1 /f
-reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "SearchBoxDisabledReason" /t REG_SZ /d ""FromServer" /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "SearchBoxDisabledReason" /t REG_SZ /d "FromServer" /f
 
 :: Remove search highlights
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v "EnableDynamicContentInWSB" /t REG_DWORD /d 0 /f
