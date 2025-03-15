@@ -760,9 +760,6 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "A
 :: Explorer home page set to "This PC"
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LaunchTo" /t REG_DWORD /d 1 /f
 
-:: Disable sharing wizard
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "SharingWizardOn" /t REG_DWORD /d 0 /f
-
 :: Do not animate minimizing and maximizing windows
 reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MinAnimate" /d "0" /t REG_SZ /f
 
@@ -1178,6 +1175,9 @@ reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\System" /v "AllowExperime
 :: Disable Fault Tolerant Heap https://docs.microsoft.com/en-us/windows/win32/win7appqual/fault-tolerant-heap
 rundll32 fthsvc.dll,FthSysprepSpecialize
 reg add "HKLM\SOFTWARE\Microsoft\FTH" /v "Enabled" /t REG_DWORD /d 0 /f
+
+:: Disable sharing wizard
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "SharingWizardOn" /t REG_DWORD /d 0 /f
 
 :u1end
 
