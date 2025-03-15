@@ -883,10 +883,6 @@ schtasks /Change /TN "\Microsoft\Windows\DiskCleanup\SilentCleanup" /ENABLE
 :: Delay appx autoremoval until after user logon becaus I dont trust Microsoft to do it right
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\Setup\Upgrade\Appx\Applications" /v "NoReRegisterOnUpgrade" /t REG_DWORD /d 1 /f
 
-:: Disable Fault Tolerant Heap https://docs.microsoft.com/en-us/windows/win32/win7appqual/fault-tolerant-heap
-rundll32 fthsvc.dll,FthSysprepSpecialize
-reg add "HKLM\SOFTWARE\Microsoft\FTH" /v "Enabled" /t REG_DWORD /d 0 /f
-
 :: Telemetry services
 sc config OneSyncSvc start= disabled
 sc config TrkWks start= disabled
@@ -1178,6 +1174,10 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "DisableWUfB
 
 :: Disable Microsoft Experimentation (breaks KIR) https://winaero.com/disabling-experimentation-in-windows-10-also-breaks-known-issue-rollback/
 reg add "HKLM\SOFTWARE\Microsoft\PolicyManager\default\System" /v "AllowExperimentation" /t REG_DWORD /d 0 /f
+
+:: Disable Fault Tolerant Heap https://docs.microsoft.com/en-us/windows/win32/win7appqual/fault-tolerant-heap
+rundll32 fthsvc.dll,FthSysprepSpecialize
+reg add "HKLM\SOFTWARE\Microsoft\FTH" /v "Enabled" /t REG_DWORD /d 0 /f
 
 :u1end
 
