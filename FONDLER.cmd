@@ -914,6 +914,9 @@ fsutil 8dot3name set c: 1
 fsutil 8dot3name strip /f /s /v c:
 fsutil behavior set disable8dot3 1
 
+:: Disable last access because its generally useless
+fsutil behavior set disablelastaccess 1
+
 :: Make bootloader use actual screen resolution
 bcdedit /set {globalsettings} highestmode true
 
