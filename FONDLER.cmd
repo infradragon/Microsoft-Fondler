@@ -632,7 +632,7 @@ powershell -c "New-ItemProperty -Path 'HKCU:\Control Panel\Quick Actions\Control
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\BootControl" /v "BootProgressAnimation" /t REG_DWORD /d 1 /f
 
 :: Disable " - Shortcut" text and the end of newly created shortcuts
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\NamingTemplates" /v "ShortcutNameTemplate" /d "\"%s.lnk\"" /t REG_SZ /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\NamingTemplates" /v "ShortcutNameTemplate" /d "%s.lnk" /t REG_SZ /f
 
 :: Add end task to app's taskbar context menu
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" /v "TaskbarEndTask" /t REG_DWORD /d 1 /f
