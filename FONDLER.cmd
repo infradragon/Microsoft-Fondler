@@ -905,6 +905,7 @@ sc config WerSvc start= disabled
 sc config wercplsupport start= disabled
 sc config UCPD start= disabled
 sc config Telemetry start= disabled
+sc config dwmappushservice start= disabled
 
 :: Location services
 sc config lfsvc start= disabled
@@ -925,7 +926,7 @@ setx POWERSHELL_TELEMETRY_OPTOUT 1
 :: Disable .NET CLI telemetry
 setx DOTNET_CLI_TELEMETRY_OPTOUT 1
 
-:: Delete telemetry cache
+:: Delete telemetry service cache
 del "%ProgramData%\Microsoft\Diagnosis\ETLLogs\AutoLogger\DiagTrack*" "%ProgramData%\Microsoft\Diagnosis\ETLLogs\ShutdownLogger\DiagTrack*" > nul 2>&1
 
 :: Set ps1 files to open with powershell (duh)
@@ -939,7 +940,7 @@ fsutil behavior set disable8dot3 1
 :: Make bootloader use actual screen resolution
 bcdedit /set {globalsettings} highestmode true
 
-:: Explicitly enable startup repair on unexpected shutdown
+:: Explicitly enable startup repair on unexpected shutdown (annoying but saved my ass twice)
 bcdedit /set {current} bootstatuspolicy DisplayAllFailures
 
 :: Allow pressing f8 during startup for advanced options
