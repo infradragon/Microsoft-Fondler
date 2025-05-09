@@ -7,43 +7,30 @@
 :: Re-launch the script with x64 process if it was initiated by x86 process on x64 bit Windows
 :: or with ARM64 process if it was initiated by x86/ARM32 process on ARM64 Windows
 
-set "_cmdf=%~f0"
-for %%# in (%*) do (
-if /i "%%#"=="r1" set r1=1
-if /i "%%#"=="r2" set r2=1
-)
-
-if exist %SystemRoot%\Sysnative\cmd.exe if not defined r1 (
+if exist %SystemRoot%\Sysnative\cmd.exe if not defined re1 (
 setlocal EnableDelayedExpansion
-start %SystemRoot%\Sysnative\cmd.exe /c ""!_cmdf!" %* r1"
+start %SystemRoot%\Sysnative\cmd.exe /c ""!_cmdf!" %* re1"
 exit /b
 )
 
 :: Re-launch the script with ARM32 process if it was initiated by x64 process on ARM64 Windows
 
-if exist %SystemRoot%\SysArm32\cmd.exe if %PROCESSOR_ARCHITECTURE%==AMD64 if not defined r2 (
+if exist %SystemRoot%\SysArm32\cmd.exe if %PROCESSOR_ARCHITECTURE%==AMD64 if not defined re2 (
 setlocal EnableDelayedExpansion
-start %SystemRoot%\SysArm32\cmd.exe /c ""!_cmdf!" %* r2"
+start %SystemRoot%\SysArm32\cmd.exe /c ""!_cmdf!" %* re2"
 exit /b
-)
-
-::  Set Path variable, it helps if it is misconfigured in the system
-
-set "PATH=%SystemRoot%\System32;%SystemRoot%\System32\wbem;%SystemRoot%\System32\WindowsPowerShell\v1.0\"
-if exist "%SystemRoot%\Sysnative\reg.exe" (
-set "PATH=%SystemRoot%\Sysnative;%SystemRoot%\Sysnative\wbem;%SystemRoot%\Sysnative\WindowsPowerShell\v1.0\;%PATH%"
 )
 
 ::  Check LF line ending
 
 pushd "%~dp0"
->nul findstr /rxc:".*" "%~nx0"
-if not %errorlevel%==0 (
+>nul findstr /v "$" "%~nx0" && (
 echo:
-echo Error: Script either has LF line ending issue, or it failed to read itself.
+echo Error - Script either has LF line ending issue or an empty line at the end of the script is missing.
 echo:
+echo:
+ping 127.0.0.1 -n 20 >nul
 popd
-ping 127.0.0.1 -n 6 > nul
 exit /b
 )
 popd
@@ -54,56 +41,67 @@ cls
 color 07
 title  Microsoft-Fondler
 
-::========================================================================================================================================
+set _args=
+set _elev=
+set _unattended=0
 
-set winbuild=1
-set "nul=>nul 2>&1"
-for /f "tokens=6 delims=[]. " %%G in ('ver') do set winbuild=%%G
-
-set _NCS=1
-if %winbuild% LSS 10586 set _NCS=0
-if %winbuild% GEQ 10586 reg query "HKCU\Console" /v ForceV2 2>nul | find /i "0x0" 1>nul && (set _NCS=0)
-
-::========================================================================================================================================
-
-if %winbuild% LSS 7600 (
-echo Unsupported OS version detected.
-echo Fondler is supported only for Windows 7/8/8.1/10/11 and their Server equivalent.
-goto FondlerEnd
+set _args=%*
+if defined _args set _args=%_args:"=%
+if defined _args set _args=%_args:re1=%
+if defined _args set _args=%_args:re2=%
+if defined _args (
+for %%A in (%_args%) do (
+if /i "%%A"=="-el"                    set _elev=1
+)
 )
 
-for %%# in (powershell.exe) do @if "%%~$PATH:#"=="" (
-echo Unable to find powershell.exe in the system.
-echo Aborting...
-goto FondlerEnd
-)
+if defined _args echo "%_args%" | find /i "/" >nul && set _unattended=1
 
 ::========================================================================================================================================
 
-::  Fix for the special characters limitation in path name
-
-set "_work=%~dp0"
-if "%_work:~-1%"=="\" set "_work=%_work:~0,-1%"
-
-set "_batf=%~f0"
-set "_batp=%_batf:'=''%"
-
-set _PSarg="""%~f0""" -el %_args%
-
-set "_ttemp=%temp%"
-
+if %winbuild% EQU 1 (
+%eline%
+echo Failed to detect Windows build number.
+echo:
 setlocal EnableDelayedExpansion
+goto FondlerEnd
+)
+
+if %winbuild% LSS 6001 (
+%nceline%
+echo Unsupported OS version detected [%winbuild%].
+echo Fondler only supports Windows Vista/7/8/8.1/10/11 and their Server equivalents.
+if %winbuild% EQU 6000 (
+echo:
+echo Windows Vista RTM is not supported because Powershell cannot be installed.
+echo Upgrade to Windows Vista SP1 or SP2.
+)
+goto FondlerEnd
+)
+
+if %winbuild% LSS 7600 if not exist "%SysPath%\WindowsPowerShell\v1.0\Modules" (
+%nceline%
+if not exist %ps% (
+echo PowerShell is not installed in your system.
+)
+echo Install PowerShell 2.0 using the following URL.
+echo:
+echo https://www.catalog.update.microsoft.com/Search.aspx?q=KB968930
+if %_unattended%==0 start https://www.catalog.update.microsoft.com/Search.aspx?q=KB968930
+goto FondlerEnd
+)
+
+::========================================================================================================================================
 
 ::  Elevate script as admin and pass arguments and preventing loop
 
->nul fltmc || (
-if not defined _elev %nul% powershell.exe "start cmd.exe -arg '/c \"!_PSarg:'=''!\"' -verb runas" && exit /b
-echo This script require administrator privileges.
-echo To do so, right click on this script and select 'Run as administrator'.
+%nul1% fltmc || (
+if not defined _elev %psc% "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
+%eline%
+echo This script needs admin rights.
+echo Right click on this script and select 'Run as administrator'.
 goto FondlerEnd
 )
-
-if not exist "%SystemRoot%\Temp\" mkdir "%SystemRoot%\Temp" 1>nul 2>nul
 
 ::========================================================================================================================================
 
