@@ -59,40 +59,6 @@ if defined _args echo "%_args%" | find /i "/" >nul && set _unattended=1
 
 ::========================================================================================================================================
 
-if %winbuild% EQU 1 (
-%eline%
-echo Failed to detect Windows build number.
-echo:
-setlocal EnableDelayedExpansion
-goto FondlerEnd
-)
-
-if %winbuild% LSS 6001 (
-%nceline%
-echo Unsupported OS version detected [%winbuild%].
-echo Fondler only supports Windows Vista/7/8/8.1/10/11 and their Server equivalents.
-if %winbuild% EQU 6000 (
-echo:
-echo Windows Vista RTM is not supported because Powershell cannot be installed.
-echo Upgrade to Windows Vista SP1 or SP2.
-)
-goto FondlerEnd
-)
-
-if %winbuild% LSS 7600 if not exist "%SysPath%\WindowsPowerShell\v1.0\Modules" (
-%nceline%
-if not exist %ps% (
-echo PowerShell is not installed in your system.
-)
-echo Install PowerShell 2.0 using the following URL.
-echo:
-echo https://www.catalog.update.microsoft.com/Search.aspx?q=KB968930
-if %_unattended%==0 start https://www.catalog.update.microsoft.com/Search.aspx?q=KB968930
-goto FondlerEnd
-)
-
-::========================================================================================================================================
-
 ::  Elevate script as admin and pass arguments and preventing loop
 
 %nul1% fltmc || (
