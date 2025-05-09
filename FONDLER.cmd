@@ -57,12 +57,27 @@ if /i "%%A"=="-el"                    set _elev=1
 
 if defined _args echo "%_args%" | find /i "/" >nul && set _unattended=1
 
+::  Fix special character limitations in path name
+
+set "_work=%~dp0"
+if "%_work:~-1%"=="\" set "_work=%_work:~0,-1%"
+
+set "_batf=%~f0"
+set "_batp=%_batf:'=''%"
+
+set _PSarg="""%~f0""" -el %_args%
+set _PSarg=%_PSarg:'=''%
+
+set "_ttemp=%userprofile%\AppData\Local\Temp"
+
+setlocal EnableDelayedExpansion
+
 ::========================================================================================================================================
 
 ::  Elevate script as admin and pass arguments and preventing loop
 
 %nul1% fltmc || (
-if not defined _elev %psc% "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
+if not defined _elev %SysPath%\WindowsPowerShell\v1.0\powershell.exe -nop -c "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
 %eline%
 echo This script needs admin rights.
 echo Right click on this script and select 'Run as administrator'.
