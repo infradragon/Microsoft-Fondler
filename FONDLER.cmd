@@ -909,9 +909,6 @@ fsutil behavior set disablelastaccess 1
 :: Make bootloader use actual screen resolution
 bcdedit /set {globalsettings} highestmode true
 
-:: Explicitly enable startup repair on unexpected shutdown (annoying but saved my ass twice)
-bcdedit /set {current} bootstatuspolicy DisplayAllFailures
-
 :: Allow pressing f8 during startup for advanced options
 bcdedit /set {bootloadersettings} bootmenupolicy legacy
 
@@ -1171,6 +1168,9 @@ reg add "HKLM\SOFTWARE\Microsoft\FTH" /v "Enabled" /t REG_DWORD /d 0 /f
 :: Disable sharing wizard
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "SharingWizardOn" /t REG_DWORD /d 0 /f
 
+:: Explicitly enable startup repair on unexpected shutdown (annoying but saved my ass twice)
+bcdedit /set {current} bootstatuspolicy DisplayAllFailures
+
 :u1end
 
 ::========================================================================================================================================
@@ -1183,6 +1183,8 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v "ManagePrevi
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PreviewBuilds" /v "AllowBuildPreview" /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PreviewBuilds" /v "EnableConfigFlighting" /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Microsoft\WindowsSelfHost\UI\Visibility" /v "HideInsiderPage" /t REG_DWORD /d 1 /f
+
+bcdedit /set {current} bootstatuspolicy IgnoreShutdownFailures
 
 :u2end
 
