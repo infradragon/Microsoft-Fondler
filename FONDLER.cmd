@@ -341,7 +341,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Network\NewNetworkWindowOff" /f
 :: Trade throughput for latency (to be tested further later, valid values 1-70)
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t REG_DWORD /d 10 /f
 
-:: Forcefully close all apps on shutdown
+:: Forcefully close all apps on shutdown (after the timeout expires)
 reg add "HKCU\Control Panel\Desktop" /v "AutoEndTasks" /d "1" /t REG_SZ /f
 
 :: Disable context menu delay
@@ -1112,6 +1112,14 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "
 
 :: Disable USB 3 Link Power Mangement
 powercfg /setacvalueindex scheme_current 2a737441-1930-4402-8d77-b2bebba308a3 d4e98f31-5ffe-4ce1-be31-1b38b384c009 0
+
+:: Disable fullscreen optimizations (enable real exclusive fullscreen except in DX12, sacrifice alt-tab speed)
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehaviorMode" /d REG_DWORD /d 2 /f
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_EFSEFeatureFlags" /d REG_DWORD /d 0 /f
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_DSEBehavior" /d REG_DWORD /d 2 /f
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehaviorMode" /d REG_DWORD /d 2 /f
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_HonorUserFSEBehaviorMode" /d REG_DWORD /d 1 /f
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_DXGIHonorFSEWindowsCompatible" /d REG_DWORD /d 1 /f
 
 :d1end
 
