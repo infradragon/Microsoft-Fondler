@@ -1,5 +1,5 @@
 @setlocal DisableDelayedExpansion
-@echo off &title commence the fondling
+@echo off &title Microsoft-Fondler
 
 :: Thank you to awuctl and lyssa for the ideas
 ::===============================================================================
@@ -21,54 +21,11 @@ start %SystemRoot%\SysArm32\cmd.exe /c ""!_cmdf!" %* re2"
 exit /b
 )
 
-::  Check LF line ending
-
-pushd "%~dp0"
->nul findstr /v "$" "%~nx0" && (
-echo:
-echo Error - Script either has LF line ending issue or an empty line at the end of the script is missing.
-echo:
-echo:
-ping 127.0.0.1 -n 20 >nul
-popd
-exit /b
-)
-popd
-
 ::========================================================================================================================================
 
 cls
 color 07
 title  Microsoft-Fondler
-
-set _args=
-set _elev=
-set _unattended=0
-
-set _args=%*
-if defined _args set _args=%_args:"=%
-if defined _args set _args=%_args:re1=%
-if defined _args set _args=%_args:re2=%
-if defined _args (
-for %%A in (%_args%) do (
-if /i "%%A"=="-el"                    set _elev=1
-)
-)
-
-if defined _args echo "%_args%" | find /i "/" >nul && set _unattended=1
-
-::  Fix special character limitations in path name
-
-set "_work=%~dp0"
-if "%_work:~-1%"=="\" set "_work=%_work:~0,-1%"
-
-set "_batf=%~f0"
-set "_batp=%_batf:'=''%"
-
-set _PSarg="""%~f0""" -el %_args%
-set _PSarg=%_PSarg:'=''%
-
-set "_ttemp=%userprofile%\AppData\Local\Temp"
 
 setlocal EnableDelayedExpansion
 
@@ -959,7 +916,7 @@ setlocal enabledelayedexpansion
 
 :: Define the list of appx packages to remove
 set packages[1]=ActiproSoftware
-set packages[2]=AdobeSystemIncorporated. AdobePhotoshop
+set packages[2]=AdobeSystemIncorporated.AdobePhotoshop
 set packages[3]=Clipchamp.Clipchamp
 set packages[4]=Duolingo
 set packages[5]=EclipseManager
