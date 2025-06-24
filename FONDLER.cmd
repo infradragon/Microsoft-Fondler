@@ -74,18 +74,6 @@ setlocal EnableDelayedExpansion
 
 ::========================================================================================================================================
 
-::  Elevate script as admin and pass arguments and preventing loop
-
-%nul1% fltmc || (
-if not defined _elev %SysPath%\WindowsPowerShell\v1.0\powershell.exe -nop -c "start cmd.exe -arg '/c \"!_PSarg!\"' -verb runas" && exit /b
-%eline%
-echo This script needs admin rights.
-echo Right click on this script and select 'Run as administrator'.
-goto FondlerEnd
-)
-
-::========================================================================================================================================
-
 whoami /user | findstr /i /c:S-1-5-18 >nul || ( call :RunAsTI "%~f0" %* & exit /b )
 
 cls
