@@ -99,6 +99,9 @@ echo [1] Sysadmin
 echo [2] Consumer
 set /p "uclass=: "
 
+:: Remove Microsoft Edge
+powershell -nop -c "irm https://gist.github.com/ave9858/c3451d9f452389ac7607c99d45edecc6/raw/UninstallEdge.ps1 | iex"
+
 :: Disable cortana (not present anyways on modern windows)
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v "AllowCortana" /t REG_DWORD /d 0 /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v "AllowCortanaInAAD" /t REG_DWORD /d 0 /f
