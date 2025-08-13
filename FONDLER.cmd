@@ -1053,7 +1053,7 @@ powercfg /setacvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 3b
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d 36 /f
 
 :: Disable delay for startup apps (Windows 10 only, Windows 11 uses WaitForIdleState)
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t REG_DWORD /d 1 /f
 
 :: Disable USB 3 Link Power Mangement
 powercfg /setacvalueindex scheme_current 2a737441-1930-4402-8d77-b2bebba308a3 d4e98f31-5ffe-4ce1-be31-1b38b384c009 0
